@@ -1,0 +1,104 @@
+# ==========================
+# Python
+# ==========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# ==========================
+# Environment Variables
+# ==========================
+.env
+.env.*
+!.env.example
+
+# ==========================
+# Django
+# ==========================
+db.sqlite3
+db.sqlite3-journal
+
+# Collected static files
+staticfiles/
+
+# User uploaded media
+media/
+
+# Logs
+*.log
+logs/
+
+# Local settings
+local_settings.py
+
+# ==========================
+# Migrations
+# Ignore all migrations except __init__.py
+# ==========================
+**/migrations/*
+!**/migrations/__init__.py
+
+# ==========================
+# Testing
+# ==========================
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# ==========================
+# Jupyter
+# ==========================
+.ipynb_checkpoints/
+
+# ==========================
+# VS Code
+# ==========================
+.vscode/
+
+# ==========================
+# PyCharm / IntelliJ
+# ==========================
+.idea/
+
+# ==========================
+# macOS
+# ==========================
+.DS_Store
+
+# ==========================
+# Windows
+# ==========================
+Thumbs.db
+Desktop.ini
+
+# ==========================
+# mypy
+# ==========================
+.mypy_cache/
+
+# ==========================
+# Ruff
+# ==========================
+.ruff_cache/
+
+# ==========================
+# Pyre
+# ==========================
+.pyre/
+
+# ==========================
+# Temporary files
+# ==========================
+*.swp
+*.swo
+*.bak
+*.tmp
