@@ -1,0 +1,6 @@
+{% extends "accounts/base.html" %}
+{% block title %}{{ label }}s{% endblock %}
+{% block content %}
+<div class="actions" style="justify-content: space-between; margin-bottom: 18px;"><h1 style="margin:0;">{{ label }}s</h1><a class="button" href="{% url create_url %}">Create {{ label }}</a></div>
+<table><thead><tr><th>Name</th><th>Active</th><th></th></tr></thead><tbody>{% for item in items %}<tr><td>{{ item.name }}</td><td>{{ item.is_active }}</td><td><a href="{% url edit_url item.id %}">Edit</a></td></tr>{% empty %}<tr><td colspan="3">No {{ label|lower }}s created yet.</td></tr>{% endfor %}</tbody></table>
+{% endblock %}

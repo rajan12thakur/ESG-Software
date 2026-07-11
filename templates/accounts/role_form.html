@@ -1,0 +1,12 @@
+{% extends "accounts/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1>
+<form class="panel" method="post">{% csrf_token %}
+{{ form.name.errors }}<label for="{{ form.name.id_for_label }}">Role name</label>{{ form.name }}
+{{ form.description.errors }}<label for="{{ form.description.id_for_label }}">Description</label>{{ form.description }}
+<label>Permissions</label>{{ form.permissions.errors }}
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:8px; margin-bottom:14px;">{% for checkbox in form.permissions %}<label style="margin:0; font-weight:400;">{{ checkbox.tag }} {{ checkbox.choice_label }}</label>{% empty %}<span>No permissions are available.</span>{% endfor %}</div>
+<label style="display:flex; gap:8px; align-items:center;">{{ form.is_active }} Active</label>
+<div class="actions"><button type="submit">Save</button><a class="button secondary" href="{% url 'account-role-list' %}">Cancel</a></div></form>
+{% endblock %}
