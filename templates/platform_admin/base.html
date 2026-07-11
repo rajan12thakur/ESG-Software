@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Platform Admin{% endblock %}</title>
+    <style>
+        :root {
+            --bg: #f5f7f3;
+            --panel: #ffffff;
+            --ink: #19231a;
+            --muted: #657061;
+            --line: #d9e1d4;
+            --accent: #2f6f4e;
+            --danger: #9d2d1c;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+
+        header {
+            background: var(--panel);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .bar,
+        main {
+            width: min(1160px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        .bar {
+            min-height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        main {
+            padding: 28px 0;
+        }
+
+        h1 {
+            margin: 0 0 20px;
+            font-size: 28px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .label {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 10px;
+            font: inherit;
+        }
+
+        label {
+            display: block;
+            margin: 14px 0 6px;
+            font-weight: 700;
+        }
+
+        button,
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            background: var(--accent);
+            color: #fff;
+            padding: 0 14px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .secondary {
+            background: #fff;
+            color: var(--accent);
+        }
+
+        .danger {
+            border-color: var(--danger);
+            background: var(--danger);
+        }
+
+        .messages {
+            margin-bottom: 16px;
+        }
+
+        .message {
+            background: #eef7ef;
+            border: 1px solid #cce2ce;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        form.inline {
+            display: inline;
+        }
+
+        @media (max-width: 780px) {
+            .bar {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 14px 0;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="bar">
+            <strong>ESG Platform Admin</strong>
+            <nav>
+                <a href="{% url 'platform-dashboard' %}">Dashboard</a>
+                <a href="{% url 'platform-company-list' %}">Companies</a>
+                {% if request.user.is_authenticated %}
+                    <form class="inline" method="post" action="{% url 'platform-logout' %}">
+                        {% csrf_token %}
+                        <button class="secondary" type="submit">Logout</button>
+                    </form>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

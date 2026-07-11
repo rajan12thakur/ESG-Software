@@ -1,0 +1,33 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}{{ managed_user.full_name }}{% endblock %}
+
+{% block content %}
+<div class="actions" style="justify-content: space-between; margin-bottom: 18px;">
+    <h1 style="margin: 0;">{{ managed_user.full_name }}</h1>
+    <div class="actions">
+        <a class="button secondary" href="{% url 'account-user-update' managed_user.id %}">Edit</a>
+        {% if managed_user.is_active %}
+            <form method="post" action="{% url 'account-user-deactivate' managed_user.id %}">
+                {% csrf_token %}
+                <button class="danger" type="submit">Deactivate</button>
+            </form>
+        {% else %}
+            <form method="post" action="{% url 'account-user-activate' managed_user.id %}">
+                {% csrf_token %}
+                <button type="submit">Activate</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<section class="panel">
+    <p><strong>Email:</strong> {{ managed_user.email }}</p>
+    <p><strong>Employee Code:</strong> {{ managed_user.employee_code }}</p>
+    <p><strong>Phone:</strong> {{ managed_user.phone }}</p>
+    <p><strong>Role:</strong> {{ managed_user.role.name }}</p>
+    <p><strong>Company Admin:</strong> {{ managed_user.is_company_admin }}</p>
+    <p><strong>Active:</strong> {{ managed_user.is_active }}</p>
+    <p><strong>Last Login:</strong> {{ managed_user.last_login|default:"Never" }}</p>
+</section>
+{% endblock %}

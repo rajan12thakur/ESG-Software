@@ -1,0 +1,37 @@
+{% extends "platform_admin/base.html" %}
+
+{% block title %}Companies{% endblock %}
+
+{% block content %}
+<div class="actions" style="justify-content: space-between; margin-bottom: 18px;">
+    <h1 style="margin: 0;">Companies</h1>
+    <a class="button" href="{% url 'platform-company-create' %}">Create Company</a>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Legal Name</th>
+            <th>Display Name</th>
+            <th>Status</th>
+            <th>Country</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for company in companies %}
+            <tr>
+                <td>{{ company.legal_name }}</td>
+                <td>{{ company.display_name }}</td>
+                <td>{{ company.status }}</td>
+                <td>{{ company.country }}</td>
+                <td><a href="{% url 'platform-company-detail' company.id %}">Manage</a></td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5">No companies created yet.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

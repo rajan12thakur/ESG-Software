@@ -1,0 +1,16 @@
+{% extends "platform_admin/base.html" %}
+
+{% block title %}Create Company Admin{% endblock %}
+
+{% block content %}
+<h1>Create Company Admin for {{ company }}</h1>
+
+<form class="panel" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="actions">
+        <button type="submit">Create Admin</button>
+        <a class="button secondary" href="{% url 'platform-company-detail' company.id %}">Cancel</a>
+    </div>
+</form>
+{% endblock %}

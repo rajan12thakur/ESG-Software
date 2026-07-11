@@ -1,0 +1,16 @@
+{% extends "platform_admin/base.html" %}
+
+{% block title %}Create Company{% endblock %}
+
+{% block content %}
+<h1>Create Company</h1>
+
+<form class="panel" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="actions">
+        <button type="submit">Create</button>
+        <a class="button secondary" href="{% url 'platform-company-list' %}">Cancel</a>
+    </div>
+</form>
+{% endblock %}

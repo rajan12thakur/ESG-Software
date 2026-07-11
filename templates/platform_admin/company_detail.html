@@ -1,0 +1,68 @@
+{% extends "platform_admin/base.html" %}
+
+{% block title %}{{ company }}{% endblock %}
+
+{% block content %}
+<div class="actions" style="justify-content: space-between; margin-bottom: 18px;">
+    <h1 style="margin: 0;">{{ company }}</h1>
+    <div class="actions">
+        {% if company.status == "active" %}
+            <form method="post" action="{% url 'platform-company-deactivate' company.id %}">
+                {% csrf_token %}
+                <button class="danger" type="submit">Deactivate</button>
+            </form>
+        {% else %}
+            <form method="post" action="{% url 'platform-company-activate' company.id %}">
+                {% csrf_token %}
+                <button type="submit">Activate</button>
+            </form>
+        {% endif %}
+        <a class="button secondary" href="{% url 'platform-company-admin-create' company.id %}">Create Company Admin</a>
+    </div>
+</div>
+
+<section class="grid">
+    <article class="panel">
+        <div class="label">Legal Name</div>
+        <div class="value">{{ company.legal_name }}</div>
+    </article>
+    <article class="panel">
+        <div class="label">Status</div>
+        <div class="value">{{ company.status }}</div>
+    </article>
+    <article class="panel">
+        <div class="label">Country</div>
+        <div class="value">{{ company.country }}</div>
+    </article>
+    <article class="panel">
+        <div class="label">Demo Tenant</div>
+        <div class="value">{{ company.is_demo_tenant }}</div>
+    </article>
+</section>
+
+<h1 style="margin-top: 32px;">Company Admins</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Active</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for admin in admins %}
+            <tr>
+                <td>{{ admin.full_name }}</td>
+                <td>{{ admin.email }}</td>
+                <td>{{ admin.role.name }}</td>
+                <td>{{ admin.is_active }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">No company admin created yet.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
