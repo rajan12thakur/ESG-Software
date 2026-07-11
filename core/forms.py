@@ -1,0 +1,35 @@
+from django import forms
+
+from core.models import CompanyProfile, Department, Facility, OrganizationUnit
+
+
+class CompanyProfileForm(forms.ModelForm):
+    class Meta:
+        model = CompanyProfile
+        fields = ["sector", "sub_sector", "employee_count", "annual_revenue", "listed_status", "stock_exchange", "description"]
+
+
+class OrganizationUnitForm(forms.ModelForm):
+    class Meta:
+        model = OrganizationUnit
+        fields = ["parent_unit", "name", "unit_type", "country", "state", "city", "ownership_percentage", "operational_control", "financial_control", "is_active"]
+
+    def __init__(self, *args, company, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["parent_unit"].queryset = OrganizationUnit.objects.filter(company=company).exclude(pk=self.instance.pk)
+
+
+class FacilityForm(forms.ModelForm):
+    class Meta:
+        model = Facility
+        fields = ["organization_unit", "name", "facility_type", "address", "country", "state", "city", "latitude", "longitude", "is_active"]
+
+    def __init__(self, *args, company, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["organization_unit"].queryset = OrganizationUnit.objects.filter(company=company, is_active=True)
+
+
+class DepartmentForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = ["name", "description", "is_active"]

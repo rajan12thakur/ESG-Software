@@ -101,14 +101,17 @@
             font-weight: 700;
         }
 
-        input,
-        select {
+        input:not([type="checkbox"]),
+        select,
+        textarea {
             width: 100%;
             border: 1px solid var(--line);
             border-radius: 6px;
             padding: 10px;
             font: inherit;
         }
+
+        input[type="checkbox"] { width: auto; }
 
         button,
         .button {
@@ -164,6 +167,11 @@
             <nav>
                 <a href="{% url 'company-dashboard' %}">Dashboard</a>
                 <a href="{% url 'account-user-list' %}">Users</a>
+                <a href="{% url 'account-role-list' %}">Roles</a>
+                <a href="{% url 'company-department-list' %}">Departments</a>
+                <a href="{% url 'company-unit-list' %}">Organization Units</a>
+                <a href="{% url 'company-facility-list' %}">Facilities</a>
+                <a href="{% url 'company-profile' %}">Company Profile</a>
                 <form method="post" action="{% url 'company-logout' %}">
                     {% csrf_token %}
                     <button class="secondary" type="submit">Logout</button>

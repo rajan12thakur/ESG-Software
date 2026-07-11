@@ -132,6 +132,8 @@
             <div class="actions">
                 {% if user_account.is_company_admin %}
                     <a href="{% url 'account-user-list' %}">Manage Users</a>
+                    <a href="{% url 'account-role-list' %}">Manage Roles</a>
+                    <a href="{% url 'company-department-list' %}">Manage Organization</a>
                 {% endif %}
                 <form method="post" action="{% url 'company-logout' %}">
                     {% csrf_token %}

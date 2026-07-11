@@ -10,4 +10,7 @@ urlpatterns = [
     path("users/<uuid:user_id>/edit/", views.user_update_view, name="account-user-update"),
     path("users/<uuid:user_id>/activate/", views.user_activate_view, name="account-user-activate"),
     path("users/<uuid:user_id>/deactivate/", views.user_deactivate_view, name="account-user-deactivate"),
+    path("roles/", views.role_list_view, name="account-role-list"),
+    path("roles/create/", views.role_create_view, name="account-role-create"),
+    path("roles/<uuid:role_id>/edit/", views.role_update_view, name="account-role-update"),
 ]

@@ -4,8 +4,8 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods, require_POST
 
-from accounts.forms import UserAccountCreateForm, UserAccountUpdateForm
-from accounts.models import UserAccount
+from accounts.forms import CompanyRoleForm, UserAccountCreateForm, UserAccountUpdateForm
+from accounts.models import Role, UserAccount, UserDepartment, UserRole
 
 
 def company_admin_required(view_func):
@@ -27,6 +27,14 @@ def _company_user_or_404(request: HttpRequest, user_id):
     )
 
 
+def _sync_user_relations(user, departments, assigned_by):
+    UserDepartment.objects.filter(user=user).exclude(department__in=departments).delete()
+    for department in departments:
+        UserDepartment.objects.get_or_create(user=user, department=department)
+    UserRole.objects.filter(user=user).exclude(role=user.role).delete()
+    UserRole.objects.get_or_create(user=user, role=user.role, defaults={"assigned_by": assigned_by})
+
+
 @company_admin_required
 @require_http_methods(["GET"])
 def user_list_view(request: HttpRequest) -> HttpResponse:
@@ -43,6 +51,7 @@ def user_create_view(request: HttpRequest) -> HttpResponse:
         user.company = request.company
         user.password = make_password(form.cleaned_data["password"])
         user.save()
+        _sync_user_relations(user, form.cleaned_data["departments"], request.user_account)
         messages.success(request, "User created successfully.")
         return redirect("account-user-detail", user_id=user.id)
     return render(request, "accounts/user_form.html", {"form": form, "title": "Create User"})
@@ -61,7 +70,8 @@ def user_update_view(request: HttpRequest, user_id) -> HttpResponse:
     user = _company_user_or_404(request, user_id)
     form = UserAccountUpdateForm(request.POST or None, instance=user, company=request.company)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        user = form.save()
+        _sync_user_relations(user, form.cleaned_data["departments"], request.user_account)
         messages.success(request, "User updated successfully.")
         return redirect("account-user-detail", user_id=user.id)
     return render(request, "accounts/user_form.html", {"form": form, "title": "Edit User"})
@@ -88,3 +98,41 @@ def user_deactivate_view(request: HttpRequest, user_id) -> HttpResponse:
     user.save(update_fields=["is_active", "updated_at"])
     messages.success(request, "User deactivated.")
     return redirect("account-user-detail", user_id=user.id)
+
+
+@company_admin_required
+@require_http_methods(["GET"])
+def role_list_view(request: HttpRequest) -> HttpResponse:
+    roles = Role.objects.filter(company=request.company).prefetch_related("role_permissions__permission").order_by("name")
+    return render(request, "accounts/role_list.html", {"roles": roles})
+
+
+@company_admin_required
+@require_http_methods(["GET", "POST"])
+def role_create_view(request: HttpRequest) -> HttpResponse:
+    form = CompanyRoleForm(request.POST or None, company=request.company)
+    if request.method == "POST" and form.is_valid():
+        role = form.save(commit=False)
+        role.company = request.company
+        role.save()
+        form.instance = role
+        form.save_permissions()
+        messages.success(request, "Role created successfully.")
+        return redirect("account-role-list")
+    return render(request, "accounts/role_form.html", {"form": form, "title": "Create Role"})
+
+
+@company_admin_required
+@require_http_methods(["GET", "POST"])
+def role_update_view(request: HttpRequest, role_id) -> HttpResponse:
+    role = get_object_or_404(Role, id=role_id, company=request.company)
+    if role.is_system_role:
+        messages.error(request, "System roles cannot be changed.")
+        return redirect("account-role-list")
+    form = CompanyRoleForm(request.POST or None, instance=role, company=request.company)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        form.save_permissions()
+        messages.success(request, "Role updated successfully.")
+        return redirect("account-role-list")
+    return render(request, "accounts/role_form.html", {"form": form, "title": "Edit Role"})
