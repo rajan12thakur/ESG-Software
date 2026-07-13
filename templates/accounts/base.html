@@ -113,6 +113,10 @@
 
         input[type="checkbox"] { width: auto; }
 
+        .permission-checklist ul { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+        .permission-checklist li label { margin: 0; font-weight: 400; }
+        small { color: var(--muted); }
+
         button,
         .button {
             display: inline-flex;
@@ -170,7 +174,6 @@
                 <a href="{% url 'account-role-list' %}">Roles</a>
                 <a href="{% url 'company-department-list' %}">Departments</a>
                 <a href="{% url 'company-unit-list' %}">Organization Units</a>
-                <a href="{% url 'company-facility-list' %}">Facilities</a>
                 <a href="{% url 'company-profile' %}">Company Profile</a>
                 <form method="post" action="{% url 'company-logout' %}">
                     {% csrf_token %}

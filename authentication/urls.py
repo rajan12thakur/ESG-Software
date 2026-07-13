@@ -1,12 +1,12 @@
 from django.urls import path
 
-from authentication.views import dashboard_view, login_api_view, login_view, logout_view, me_view
+from authentication import views
 
 
 urlpatterns = [
-    path("login/", login_view, name="company-login"),
-    path("login/api/", login_api_view, name="company-login-api"),
-    path("logout/", logout_view, name="company-logout"),
-    path("dashboard/", dashboard_view, name="company-dashboard"),
-    path("me/", me_view, name="company-me"),
+    path("login/", views.CompanyLoginView.as_view(), name="company-login"),
+    path("login/api/", views.CompanyLoginAPIView.as_view(), name="company-login-api"),
+    path("logout/", views.CompanyLogoutView.as_view(), name="company-logout"),
+    path("dashboard/", views.CompanyDashboardView.as_view(), name="company-dashboard"),
+    path("me/", views.CompanyMeView.as_view(), name="company-me"),
 ]

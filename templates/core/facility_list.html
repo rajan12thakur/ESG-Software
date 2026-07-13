@@ -1,0 +1,12 @@
+{% extends "accounts/base.html" %}
+{% block title %}Facilities — {{ unit.name }}{% endblock %}
+{% block content %}
+<div class="actions" style="justify-content:space-between; margin-bottom:18px;">
+    <div><h1 style="margin:0;">Facilities</h1><p>{{ unit.name }}</p></div>
+    <div class="actions"><a class="button secondary" href="{% url 'company-unit-list' %}">Organization Units</a><a class="button" href="{% url 'company-unit-facility-create' unit.id %}">Create Facility</a></div>
+</div>
+<table><thead><tr><th>Name</th><th>Type</th><th>Location</th><th>Active</th><th></th></tr></thead><tbody>
+{% for facility in facilities %}<tr><td>{{ facility.name }}</td><td>{{ facility.facility_type|default:"—" }}</td><td>{{ facility.city|default:"" }}{% if facility.city and facility.country %}, {% endif %}{{ facility.country|default:"—" }}</td><td>{{ facility.is_active }}</td><td><a href="{% url 'company-unit-facility-update' unit.id facility.id %}">Edit</a></td></tr>
+{% empty %}<tr><td colspan="5">No facilities have been created for this organization unit.</td></tr>{% endfor %}
+</tbody></table>
+{% endblock %}

@@ -24,9 +24,13 @@ class FacilityForm(forms.ModelForm):
         model = Facility
         fields = ["organization_unit", "name", "facility_type", "address", "country", "state", "city", "latitude", "longitude", "is_active"]
 
-    def __init__(self, *args, company, **kwargs):
+    def __init__(self, *args, company, organization_unit=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["organization_unit"].queryset = OrganizationUnit.objects.filter(company=company, is_active=True)
+        if organization_unit:
+            # A facility is always created in the context of an organization unit.
+            self.fields.pop("organization_unit")
+        else:
+            self.fields["organization_unit"].queryset = OrganizationUnit.objects.filter(company=company, is_active=True)
 
 
 class DepartmentForm(forms.ModelForm):

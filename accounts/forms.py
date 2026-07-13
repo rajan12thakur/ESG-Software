@@ -32,9 +32,41 @@ class CompanyRoleForm(forms.ModelForm):
             RolePermission.objects.get_or_create(role=self.instance, permission=permission)
 
 
+class PermissionDefinitionForm(forms.Form):
+    ACTIONS = ("View", "Create", "Edit", "Delete", "Update")
+
+    model_name = forms.CharField(
+        max_length=150,
+        help_text="Use a clear plural name, such as Projects or ESG Data.",
+    )
+    actions = forms.MultipleChoiceField(
+        choices=[(action.lower(), action) for action in ACTIONS],
+        initial=[action.lower() for action in ACTIONS],
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    def clean_model_name(self):
+        return " ".join(self.cleaned_data["model_name"].split())
+
+    def save(self):
+        model_name = self.cleaned_data["model_name"]
+        slug = model_name.lower().replace(" ", "_")
+        for action in self.cleaned_data["actions"]:
+            Permission.objects.get_or_create(
+                code=f"{slug}.{action}",
+                defaults={"name": f"{action.title()} {model_name}", "module": model_name},
+            )
+
+
 class UserAccountCreateForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
-    departments = forms.ModelMultipleChoiceField(queryset=Department.objects.none(), required=False)
+    department = forms.ModelChoiceField(queryset=Department.objects.none(), required=False, empty_label="Select a department")
+    permissions = forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.none(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Select the actions this user can perform. Permissions are grouped by module.",
+    )
 
     class Meta:
         model = UserAccount
@@ -46,7 +78,6 @@ class UserAccountCreateForm(forms.ModelForm):
             "email",
             "phone",
             "password",
-            "is_company_admin",
             "is_active",
         ]
 
@@ -54,7 +85,8 @@ class UserAccountCreateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.company = company
         self.fields["role"].queryset = Role.objects.filter(company=company, is_active=True)
-        self.fields["departments"].queryset = Department.objects.filter(company=company, is_active=True)
+        self.fields["department"].queryset = Department.objects.filter(company=company, is_active=True).order_by("name")
+        self.fields["permissions"].queryset = Permission.objects.order_by("module", "name")
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
@@ -69,7 +101,8 @@ class UserAccountCreateForm(forms.ModelForm):
 
 
 class UserAccountUpdateForm(forms.ModelForm):
-    departments = forms.ModelMultipleChoiceField(queryset=Department.objects.none(), required=False)
+    department = forms.ModelChoiceField(queryset=Department.objects.none(), required=False, empty_label="Select a department")
+    permissions = forms.ModelMultipleChoiceField(queryset=Permission.objects.none(), required=False, widget=forms.CheckboxSelectMultiple)
     class Meta:
         model = UserAccount
         fields = [
@@ -79,7 +112,6 @@ class UserAccountUpdateForm(forms.ModelForm):
             "last_name",
             "email",
             "phone",
-            "is_company_admin",
             "is_active",
         ]
 
@@ -87,9 +119,11 @@ class UserAccountUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.company = company
         self.fields["role"].queryset = Role.objects.filter(company=company, is_active=True)
-        self.fields["departments"].queryset = Department.objects.filter(company=company, is_active=True)
+        self.fields["department"].queryset = Department.objects.filter(company=company, is_active=True).order_by("name")
+        self.fields["permissions"].queryset = Permission.objects.order_by("module", "name")
         if self.instance.pk:
-            self.fields["departments"].initial = self.instance.user_departments.values_list("department_id", flat=True)
+            self.fields["department"].initial = self.instance.user_departments.values_list("department_id", flat=True).first()
+            self.fields["permissions"].initial = self.instance.user_permissions.values_list("permission_id", flat=True)
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()

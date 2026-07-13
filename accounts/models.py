@@ -61,7 +61,12 @@ class UserAccount(models.Model):
             models.UniqueConstraint(
                 fields=["company", "email"],
                 name="unique_user_account_email_per_company",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["company"],
+                condition=models.Q(is_company_admin=True),
+                name="one_company_admin_per_company",
+            ),
         ]
 
     def __str__(self) -> str:
@@ -143,3 +148,30 @@ class UserDepartment(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user} -> {self.department}"
+
+
+class UserPermission(models.Model):
+    """An explicit permission granted to an individual company user."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        UserAccount,
+        on_delete=models.CASCADE,
+        related_name="user_permissions",
+    )
+    permission = models.ForeignKey(
+        Permission,
+        on_delete=models.CASCADE,
+        related_name="user_permissions",
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "permission"],
+                name="unique_permission_per_user",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user} -> {self.permission}"

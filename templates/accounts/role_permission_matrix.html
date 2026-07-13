@@ -1,0 +1,17 @@
+{% extends "accounts/base.html" %}
+{% block title %}Assign Permissions{% endblock %}
+{% block content %}
+<div class="actions" style="justify-content:space-between; margin-bottom:18px;"><h1 style="margin:0;">Assign permissions: {{ role.name }}</h1><a class="button secondary" href="{% url 'account-role-list' %}">Back to roles</a></div>
+<form method="post">{% csrf_token %}
+<table>
+    <thead><tr><th>Permission name</th>{% for action in actions %}<th style="text-align:center;">{{ action }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for row in permission_rows %}
+        <tr><td>{{ row.name }}</td>{% for cell in row.cells %}<td style="text-align:center;">{% if cell %}<input type="checkbox" name="permissions" value="{{ cell.id }}" {% if cell.id in selected_permission_ids %}checked{% endif %} aria-label="{{ cell.name }}">{% else %}&mdash;{% endif %}</td>{% endfor %}</tr>
+    {% empty %}<tr><td colspan="6">No permissions have been created yet. <a href="{% url 'account-permission-create' %}">Create permissions</a>.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+<div class="actions" style="margin-top:18px;"><button type="submit">Save permissions</button><a class="button secondary" href="{% url 'account-role-list' %}">Cancel</a></div>
+</form>
+{% endblock %}

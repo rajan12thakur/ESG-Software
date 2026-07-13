@@ -26,8 +26,18 @@
     <p><strong>Employee Code:</strong> {{ managed_user.employee_code }}</p>
     <p><strong>Phone:</strong> {{ managed_user.phone }}</p>
     <p><strong>Role:</strong> {{ managed_user.role.name }}</p>
+    <p><strong>Department:</strong> {% if department %}{{ department.department.name }}{% else %}Not assigned{% endif %}</p>
     <p><strong>Company Admin:</strong> {{ managed_user.is_company_admin }}</p>
     <p><strong>Active:</strong> {{ managed_user.is_active }}</p>
     <p><strong>Last Login:</strong> {{ managed_user.last_login|default:"Never" }}</p>
+</section>
+
+<section class="panel" style="margin-top: 18px;">
+    <h2>Assigned permissions</h2>
+    {% if permissions %}
+        <ul>{% for user_permission in permissions %}<li>{{ user_permission.permission.name }}</li>{% endfor %}</ul>
+    {% else %}
+        <p>No individual permissions assigned.</p>
+    {% endif %}
 </section>
 {% endblock %}
