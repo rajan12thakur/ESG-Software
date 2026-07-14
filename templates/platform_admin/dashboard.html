@@ -1,0 +1,52 @@
+{% extends "platform_admin/base.html" %}
+
+{% block title %}Platform Dashboard{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<section class="grid">
+    <article class="panel">
+        <div class="label">Companies</div>
+        <div class="value">{{ company_count }}</div>
+    </article>
+    <article class="panel">
+        <div class="label">Active</div>
+        <div class="value">{{ active_company_count }}</div>
+    </article>
+    <article class="panel">
+        <div class="label">Inactive</div>
+        <div class="value">{{ inactive_company_count }}</div>
+    </article>
+    <article class="panel">
+        <div class="label">Company Admins</div>
+        <div class="value">{{ company_admin_count }}</div>
+    </article>
+</section>
+
+<h1 style="margin-top: 32px;">Recent Companies</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Status</th>
+            <th>Country</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for company in recent_companies %}
+            <tr>
+                <td>{{ company }}</td>
+                <td>{{ company.status }}</td>
+                <td>{{ company.country }}</td>
+                <td><a href="{% url 'platform-company-detail' company.id %}">Open</a></td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">No companies yet.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

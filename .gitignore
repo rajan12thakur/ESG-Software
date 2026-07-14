@@ -43,6 +43,8 @@ local_settings.py
 # ==========================
 **/migrations/*
 !**/migrations/__init__.py
+!accounts/migrations/0002_userrolescope_role_unique_role_name_per_company_and_more.py
+!accounts/migrations/0004_seed_canonical_permission_catalog.py
 
 # ==========================
 # Testing

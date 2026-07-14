@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Company Admin{% endblock %}</title>
+    <style>
+        :root {
+            --bg: #f6f8f4;
+            --panel: #ffffff;
+            --ink: #182118;
+            --muted: #62705f;
+            --line: #d9e1d4;
+            --accent: #2f6f4e;
+            --danger: #9d2d1c;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+
+        header {
+            background: var(--panel);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .bar,
+        main {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        .bar {
+            min-height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        nav,
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        main {
+            padding: 28px 0;
+        }
+
+        h1 {
+            margin: 0 0 20px;
+            font-size: 28px;
+        }
+
+        a {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        label {
+            display: block;
+            margin: 14px 0 6px;
+            font-weight: 700;
+        }
+
+        input:not([type="checkbox"]),
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 10px;
+            font: inherit;
+        }
+
+        input[type="checkbox"] { width: auto; }
+
+        .permission-checklist ul { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+        .permission-checklist li label { margin: 0; font-weight: 400; }
+        small { color: var(--muted); }
+
+        button,
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            background: var(--accent);
+            color: #fff;
+            padding: 0 14px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .secondary {
+            background: #fff;
+            color: var(--accent);
+        }
+
+        .danger {
+            border-color: var(--danger);
+            background: var(--danger);
+        }
+
+        .message {
+            background: #eef7ef;
+            border: 1px solid #cce2ce;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+
+        .errorlist {
+            color: var(--danger);
+        }
+
+        @media (max-width: 760px) {
+            .bar {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 14px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="bar">
+            <strong>{{ request.company }}</strong>
+            <nav>
+                <a href="{% url 'company-dashboard' %}">Dashboard</a>
+                <a href="{% url 'account-user-list' %}">Users</a>
+                <a href="{% url 'account-role-list' %}">Roles</a>
+                <a href="{% url 'company-department-list' %}">Departments</a>
+                <a href="{% url 'company-unit-list' %}">Organization Units</a>
+                <a href="{% url 'company-profile' %}">Company Profile</a>
+                <form method="post" action="{% url 'company-logout' %}">
+                    {% csrf_token %}
+                    <button class="secondary" type="submit">Logout</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

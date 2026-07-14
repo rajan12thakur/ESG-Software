@@ -1,3 +1,1 @@
-from django.contrib import admin
-
-# Register your models here.
+# Platform admin does not define custom models.

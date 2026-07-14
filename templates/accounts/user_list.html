@@ -1,0 +1,60 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<div class="actions" style="justify-content: space-between; margin-bottom: 18px;">
+    <h1 style="margin: 0;">Users</h1>
+    <a class="button" href="{% url 'account-user-create' %}">Create User</a>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Roles</th>
+            <th>Admin</th>
+            <th>Active</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.full_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.role_assignment_summaries %}
+                        <ul style="margin: 0; padding-left: 18px;">
+                            {% for assignment in user.role_assignment_summaries %}
+                                <li>
+                                    {{ assignment.role.name }}
+                                    {% if assignment.is_unrestricted %}
+                                        <span>(Unrestricted)</span>
+                                    {% else %}
+                                        <span>(
+                                            {% for scope_group in assignment.scope_groups %}
+                                                {{ scope_group.label }}: {{ scope_group.targets|join:", " }}{% if not forloop.last %}; {% endif %}
+                                            {% endfor %}
+                                        )</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span>No assignments</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.is_company_admin }}</td>
+                <td>{{ user.is_active }}</td>
+                <td><a href="{% url 'account-user-detail' user.id %}">Open</a></td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="6">No users created yet.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Company Dashboard</title>
+    <style>
+        :root {
+            --bg: #f6f8f4;
+            --ink: #182118;
+            --muted: #62705f;
+            --line: #d9e1d4;
+            --panel: #ffffff;
+            --accent: #2f6f4e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+
+        header {
+            border-bottom: 1px solid var(--line);
+            background: var(--panel);
+        }
+
+        .bar,
+        main {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        .bar {
+            min-height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        a {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        main {
+            padding: 32px 0;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .label {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .value {
+            font-size: 18px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        form {
+            margin: 0;
+        }
+
+        button {
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: #fff;
+            color: var(--ink);
+            min-height: 38px;
+            padding: 0 14px;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        @media (max-width: 760px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .bar {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 16px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="bar">
+            <h1>{{ company }}</h1>
+            <div class="actions">
+                {% if user_account.is_company_admin %}
+                    <a href="{% url 'account-user-list' %}">Manage Users</a>
+                    <a href="{% url 'account-role-list' %}">Manage Roles</a>
+                    <a href="{% url 'company-department-list' %}">Manage Organization</a>
+                {% endif %}
+                <form method="post" action="{% url 'company-logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="summary">
+            <article class="panel">
+                <div class="label">User</div>
+                <div class="value">{{ user_account.full_name }}</div>
+            </article>
+            <article class="panel">
+                <div class="label">Email</div>
+                <div class="value">{{ user_account.email }}</div>
+            </article>
+            <article class="panel">
+                <div class="label">Tenant Code</div>
+                <div class="value">{{ company.tenant_code }}</div>
+            </article>
+        </section>
+
+        <section class="panel" style="margin-top: 24px;">
+            <div class="label">Assigned Roles</div>
+            {% if user_roles %}
+                <ul>
+                    {% for assignment in user_roles %}
+                        <li>{{ assignment.role.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No active role assignments.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

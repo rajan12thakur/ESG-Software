@@ -1,3 +1,1 @@
-from django.db import models
-
-# Create your models here.
+# Platform admins use Django's built-in auth.User model.
