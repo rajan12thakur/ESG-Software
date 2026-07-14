@@ -13,7 +13,7 @@
         <tr>
             <th>Name</th>
             <th>Email</th>
-            <th>Role</th>
+            <th>Roles</th>
             <th>Admin</th>
             <th>Active</th>
             <th></th>
@@ -24,7 +24,28 @@
             <tr>
                 <td>{{ user.full_name }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.role.name }}</td>
+                <td>
+                    {% if user.role_assignment_summaries %}
+                        <ul style="margin: 0; padding-left: 18px;">
+                            {% for assignment in user.role_assignment_summaries %}
+                                <li>
+                                    {{ assignment.role.name }}
+                                    {% if assignment.is_unrestricted %}
+                                        <span>(Unrestricted)</span>
+                                    {% else %}
+                                        <span>(
+                                            {% for scope_group in assignment.scope_groups %}
+                                                {{ scope_group.label }}: {{ scope_group.targets|join:", " }}{% if not forloop.last %}; {% endif %}
+                                            {% endfor %}
+                                        )</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span>No assignments</span>
+                    {% endif %}
+                </td>
                 <td>{{ user.is_company_admin }}</td>
                 <td>{{ user.is_active }}</td>
                 <td><a href="{% url 'account-user-detail' user.id %}">Open</a></td>

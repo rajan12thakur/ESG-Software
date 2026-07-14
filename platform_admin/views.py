@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic import DetailView, FormView, ListView, TemplateView
 
-from accounts.models import Role, UserAccount
+from accounts.models import Role, UserAccount, UserRole
 from core.models import Company
 from platform_admin.forms import CompanyForm, FirstCompanyAdminForm
 
@@ -81,7 +81,10 @@ class CompanyDetailView(PlatformAdminRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["admins"] = UserAccount.objects.filter(company=self.object, is_company_admin=True).select_related("role")
+        context["admins"] = UserAccount.objects.filter(
+            company=self.object,
+            is_company_admin=True,
+        ).prefetch_related("user_roles__role")
         return context
 
 
@@ -138,10 +141,20 @@ class FirstCompanyAdminCreateView(PlatformAdminRequiredMixin, FormView):
             form.add_error("email", "This email is already used in this company.")
             return self.form_invalid(form)
         with transaction.atomic():
-            role, _ = Role.objects.get_or_create(company=company, name="Company Admin", defaults={"description": "Default company administrator role.", "is_system_role": True, "is_active": True})
+            role, _ = Role.objects.get_or_create(
+                company=company,
+                name="Company Admin",
+                defaults={
+                    "description": "Default company administrator role.",
+                    "is_system_role": True,
+                    "is_active": True,
+                },
+            )
             user = form.save(commit=False)
-            user.company, user.role, user.password = company, role, make_password(form.cleaned_data["password"])
+            user.company = company
+            user.password = make_password(form.cleaned_data["password"])
             user.is_company_admin, user.is_active = True, True
             user.save()
+            UserRole.objects.get_or_create(user=user, role=role)
         messages.success(self.request, "Company admin created successfully.")
         return redirect("platform-company-detail", company_id=company.id)

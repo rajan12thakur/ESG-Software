@@ -12,6 +12,7 @@ class Company(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     legal_name = models.CharField(max_length=255)
     display_name = models.CharField(max_length=255, blank=True)
+    tenant_code = models.SlugField(max_length=64, unique=True)
     registration_number = models.CharField(max_length=100, blank=True)
     industry = models.CharField(max_length=150, blank=True)
     country = models.CharField(max_length=100, blank=True)

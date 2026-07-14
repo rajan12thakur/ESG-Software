@@ -17,6 +17,14 @@ class Role(models.Model):
     is_system_role = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["company", "name"],
+                name="unique_role_name_per_company",
+            )
+        ]
+
     def __str__(self) -> str:
         return self.name
 
@@ -37,11 +45,6 @@ class UserAccount(models.Model):
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE,
-        related_name="user_accounts",
-    )
-    role = models.ForeignKey(
-        Role,
-        on_delete=models.PROTECT,
         related_name="user_accounts",
     )
     employee_code = models.CharField(max_length=100, blank=True)
@@ -78,6 +81,8 @@ class UserAccount(models.Model):
 
 
 class UserRole(models.Model):
+    """Links a user to a role."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
         UserAccount,
@@ -98,8 +103,40 @@ class UserRole(models.Model):
     )
     assigned_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "role"],
+                name="unique_user_role_assignment",
+            )
+        ]
+
     def __str__(self) -> str:
         return f"{self.user} -> {self.role}"
+
+
+class UserRoleScope(models.Model):
+    """Stores scopes for one role assignment."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_role = models.ForeignKey(
+        UserRole,
+        on_delete=models.CASCADE,
+        related_name="scopes",
+    )
+    scope_type = models.CharField(max_length=100)
+    scope_id = models.UUIDField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user_role", "scope_type", "scope_id"],
+                name="unique_user_role_scope_row",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user_role} [{self.scope_type}]"
 
 
 class RolePermission(models.Model):
@@ -119,20 +156,6 @@ class RolePermission(models.Model):
         return f"{self.role} -> {self.permission}"
 
 
-class RolePermissionScope(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    role_permission = models.ForeignKey(
-        RolePermission,
-        on_delete=models.CASCADE,
-        related_name="scopes",
-    )
-    scope_type = models.CharField(max_length=100)
-    scope_id = models.UUIDField()
-
-    def __str__(self) -> str:
-        return f"{self.role_permission} [{self.scope_type}]"
-
-
 class UserDepartment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
@@ -148,30 +171,3 @@ class UserDepartment(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user} -> {self.department}"
-
-
-class UserPermission(models.Model):
-    """An explicit permission granted to an individual company user."""
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(
-        UserAccount,
-        on_delete=models.CASCADE,
-        related_name="user_permissions",
-    )
-    permission = models.ForeignKey(
-        Permission,
-        on_delete=models.CASCADE,
-        related_name="user_permissions",
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["user", "permission"],
-                name="unique_permission_per_user",
-            )
-        ]
-
-    def __str__(self) -> str:
-        return f"{self.user} -> {self.permission}"

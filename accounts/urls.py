@@ -14,5 +14,4 @@ urlpatterns = [
     path("roles/create/", views.RoleCreateView.as_view(), name="account-role-create"),
     path("roles/<uuid:role_id>/edit/", views.RoleUpdateView.as_view(), name="account-role-update"),
     path("roles/<uuid:role_id>/permissions/", views.RolePermissionMatrixView.as_view(), name="account-role-permissions"),
-    path("permissions/create/", views.PermissionCreateView.as_view(), name="account-permission-create"),
 ]

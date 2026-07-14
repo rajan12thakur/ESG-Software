@@ -154,9 +154,22 @@
                 <div class="value">{{ user_account.email }}</div>
             </article>
             <article class="panel">
-                <div class="label">Role</div>
-                <div class="value">{{ role.name }}</div>
+                <div class="label">Tenant Code</div>
+                <div class="value">{{ company.tenant_code }}</div>
             </article>
+        </section>
+
+        <section class="panel" style="margin-top: 24px;">
+            <div class="label">Assigned Roles</div>
+            {% if user_roles %}
+                <ul>
+                    {% for assignment in user_roles %}
+                        <li>{{ assignment.role.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No active role assignments.</p>
+            {% endif %}
         </section>
     </main>
 </body>

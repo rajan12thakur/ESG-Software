@@ -3,33 +3,34 @@ from functools import wraps
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 
-from accounts.models import RolePermission
+from accounts.rbac import authorize
 
 
 class RolePermissionMixin:
-    """Protect company views with a permission assigned to the current role.
-
-    Company administrators retain full access.  Set ``required_permission`` to
-    a permission code (or an iterable of codes) on a class-based view.
-    """
+    """Check tenant permissions for company views."""
 
     required_permission = None
     company_admin_only = False
+
+    def get_resource_context(self, request):
+        """Override to provide scope context."""
+
+        return None
 
     def has_required_permission(self, request):
         if request.is_company_admin:
             return True
         if self.company_admin_only:
             return False
-        if not self.required_permission or not request.role:
+        if not self.required_permission or not getattr(request, "user_account", None):
             return False
 
-        codes = (self.required_permission if isinstance(self.required_permission, (list, tuple, set))
-                 else (self.required_permission,))
-        return RolePermission.objects.filter(
-            role=request.role,
-            permission__code__in=codes,
-        ).exists()
+        return authorize(
+            request.user_account,
+            self.required_permission,
+            self.get_resource_context(request),
+            is_company_admin=request.is_company_admin,
+        )
 
     def dispatch(self, request, *args, **kwargs):
         if not getattr(request, "user_account", None):
@@ -42,7 +43,7 @@ class RolePermissionMixin:
 
 
 def company_admin_required(view_func):
-    """Compatibility decorator for legacy function-based company views."""
+    """Require a company admin."""
 
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):

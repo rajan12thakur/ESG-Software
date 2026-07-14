@@ -7,14 +7,51 @@
 
 <form class="panel" method="post">
     {% csrf_token %}
-    {% for field in form %}
-        <div{% if field.name == 'permissions' %} class="permission-checklist"{% endif %}>
+    {{ form.non_field_errors }}
+
+    {% for field in form.primary_fields %}
+        <div>
             {{ field.label_tag }}
             {{ field }}
             {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
             {{ field.errors }}
         </div>
     {% endfor %}
+
+    <section style="margin-top: 22px;">
+        <h2 style="margin: 0 0 10px;">Role Assignments</h2>
+        <div class="permission-checklist">
+            {{ form.roles.label_tag }}
+            {{ form.roles }}
+            {% if form.roles.help_text %}<small>{{ form.roles.help_text }}</small>{% endif %}
+            {{ form.roles.errors }}
+        </div>
+    </section>
+
+    <section style="margin-top: 22px;">
+        <h2 style="margin: 0 0 10px;">Role Scopes</h2>
+        <p style="margin: 0 0 14px; color: var(--muted);">Leave both selectors empty for an unrestricted role assignment.</p>
+        {% for group in form.scope_configuration_groups %}
+            <div class="panel" style="padding: 14px; margin-bottom: 14px; background: {% if group.selected %}#f7fbf7{% else %}#fbfcfa{% endif %};">
+                <strong>{{ group.role.name }}</strong>
+                <div>
+                    {{ group.org_units_field.label_tag }}
+                    {{ group.org_units_field }}
+                    {% if group.org_units_field.help_text %}<small>{{ group.org_units_field.help_text }}</small>{% endif %}
+                    {{ group.org_units_field.errors }}
+                </div>
+                <div>
+                    {{ group.facilities_field.label_tag }}
+                    {{ group.facilities_field }}
+                    {% if group.facilities_field.help_text %}<small>{{ group.facilities_field.help_text }}</small>{% endif %}
+                    {{ group.facilities_field.errors }}
+                </div>
+            </div>
+        {% empty %}
+            <p>No company roles are available yet.</p>
+        {% endfor %}
+    </section>
+
     <div class="actions">
         <button type="submit">Save</button>
         <a class="button secondary" href="{% url 'account-user-list' %}">Cancel</a>

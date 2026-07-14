@@ -14,9 +14,12 @@ class OrganizationUnitForm(forms.ModelForm):
         model = OrganizationUnit
         fields = ["parent_unit", "name", "unit_type", "country", "state", "city", "ownership_percentage", "operational_control", "financial_control", "is_active"]
 
-    def __init__(self, *args, company, **kwargs):
+    def __init__(self, *args, company, parent_queryset=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["parent_unit"].queryset = OrganizationUnit.objects.filter(company=company).exclude(pk=self.instance.pk)
+        queryset = parent_queryset
+        if queryset is None:
+            queryset = OrganizationUnit.objects.filter(company=company)
+        self.fields["parent_unit"].queryset = queryset.exclude(pk=self.instance.pk)
 
 
 class FacilityForm(forms.ModelForm):

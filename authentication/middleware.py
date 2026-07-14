@@ -1,11 +1,12 @@
 from django.http import JsonResponse
 
 from accounts.models import UserAccount
+from accounts.rbac import get_active_user_role_assignments
 from authentication.tokens import TokenError, decode_access_token
 
 
 class JWTAuthenticationMiddleware:
-    """Attach company-user JWT context to request when a Bearer token exists."""
+    """Attach tenant auth context to the request."""
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -13,7 +14,7 @@ class JWTAuthenticationMiddleware:
     def __call__(self, request):
         request.user_account = None
         request.company = None
-        request.role = None
+        request.user_roles = ()
         request.is_company_admin = False
 
         header = request.headers.get("Authorization", "")
@@ -29,19 +30,22 @@ class JWTAuthenticationMiddleware:
 
         try:
             payload = decode_access_token(token)
-            user = UserAccount.objects.select_related("company", "role").get(
+            user = UserAccount.objects.select_related("company").get(
                 id=payload["user_id"],
                 company_id=payload["company_id"],
-                role_id=payload["role_id"],
             )
         except (KeyError, UserAccount.DoesNotExist, TokenError):
             return JsonResponse({"error": "Invalid or expired token."}, status=401)
 
         if not user.is_active:
             return JsonResponse({"error": "User account is inactive."}, status=403)
+        if user.company.status != "active":
+            return JsonResponse({"error": "This company is inactive."}, status=403)
+
+        active_assignments = list(get_active_user_role_assignments(user))
 
         request.user_account = user
         request.company = user.company
-        request.role = user.role
+        request.user_roles = tuple(active_assignments)
         request.is_company_admin = user.is_company_admin
         return self.get_response(request)

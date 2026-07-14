@@ -8,7 +8,7 @@
     <tbody>
     {% for row in permission_rows %}
         <tr><td>{{ row.name }}</td>{% for cell in row.cells %}<td style="text-align:center;">{% if cell %}<input type="checkbox" name="permissions" value="{{ cell.id }}" {% if cell.id in selected_permission_ids %}checked{% endif %} aria-label="{{ cell.name }}">{% else %}&mdash;{% endif %}</td>{% endfor %}</tr>
-    {% empty %}<tr><td colspan="6">No permissions have been created yet. <a href="{% url 'account-permission-create' %}">Create permissions</a>.</td></tr>
+    {% empty %}<tr><td colspan="{{ actions|length|add:'1' }}">No seeded permissions are available.</td></tr>
     {% endfor %}
     </tbody>
 </table>

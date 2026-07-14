@@ -25,7 +25,6 @@
     <p><strong>Email:</strong> {{ managed_user.email }}</p>
     <p><strong>Employee Code:</strong> {{ managed_user.employee_code }}</p>
     <p><strong>Phone:</strong> {{ managed_user.phone }}</p>
-    <p><strong>Role:</strong> {{ managed_user.role.name }}</p>
     <p><strong>Department:</strong> {% if department %}{{ department.department.name }}{% else %}Not assigned{% endif %}</p>
     <p><strong>Company Admin:</strong> {{ managed_user.is_company_admin }}</p>
     <p><strong>Active:</strong> {{ managed_user.is_active }}</p>
@@ -33,11 +32,26 @@
 </section>
 
 <section class="panel" style="margin-top: 18px;">
-    <h2>Assigned permissions</h2>
-    {% if permissions %}
-        <ul>{% for user_permission in permissions %}<li>{{ user_permission.permission.name }}</li>{% endfor %}</ul>
+    <h2>Assigned roles and scopes</h2>
+    {% if role_assignments %}
+        <ul>
+            {% for assignment in role_assignments %}
+                <li>
+                    <strong>{{ assignment.role.name }}</strong>
+                    {% if assignment.is_unrestricted %}
+                        <span>Unrestricted</span>
+                    {% else %}
+                        <ul>
+                            {% for scope_group in assignment.scope_groups %}
+                                <li>{{ scope_group.label }}: {{ scope_group.targets|join:", " }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
     {% else %}
-        <p>No individual permissions assigned.</p>
+        <p>No role assignments found.</p>
     {% endif %}
 </section>
 {% endblock %}

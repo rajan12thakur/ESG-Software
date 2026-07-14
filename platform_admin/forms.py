@@ -11,6 +11,7 @@ class CompanyForm(forms.ModelForm):
         fields = [
             "legal_name",
             "display_name",
+            "tenant_code",
             "registration_number",
             "industry",
             "country",
@@ -19,6 +20,9 @@ class CompanyForm(forms.ModelForm):
             "status",
             "is_demo_tenant",
         ]
+
+    def clean_tenant_code(self):
+        return self.cleaned_data["tenant_code"].strip().lower()
 
 
 class FirstCompanyAdminForm(forms.ModelForm):

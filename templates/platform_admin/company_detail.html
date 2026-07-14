@@ -31,6 +31,10 @@
         <div class="value">{{ company.status }}</div>
     </article>
     <article class="panel">
+        <div class="label">Tenant Code</div>
+        <div class="value">{{ company.tenant_code }}</div>
+    </article>
+    <article class="panel">
         <div class="label">Country</div>
         <div class="value">{{ company.country }}</div>
     </article>
@@ -55,7 +59,13 @@
             <tr>
                 <td>{{ admin.full_name }}</td>
                 <td>{{ admin.email }}</td>
-                <td>{{ admin.role.name }}</td>
+                <td>
+                    {% for assignment in admin.user_roles.all %}
+                        {{ assignment.role.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        No assigned roles
+                    {% endfor %}
+                </td>
                 <td>{{ admin.is_active }}</td>
             </tr>
         {% empty %}

@@ -11,19 +11,17 @@ JWT_ALGORITHM = "HS256"
 
 
 class TokenError(Exception):
-    """Raised when a JWT is missing, invalid, or expired."""
+    """Invalid or expired token."""
 
 
 def create_access_token(user: UserAccount) -> tuple[str, datetime]:
-    """Create a short-lived JWT for a company user."""
+    """Create a JWT for a company user."""
     expires_at = datetime.now(timezone.utc) + timedelta(
         minutes=settings.JWT_ACCESS_TOKEN_LIFETIME_MINUTES
     )
     payload = {
         "user_id": str(user.id),
         "company_id": str(user.company_id),
-        "role_id": str(user.role_id),
-        "email": user.email,
         "exp": expires_at,
     }
     token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
@@ -31,7 +29,7 @@ def create_access_token(user: UserAccount) -> tuple[str, datetime]:
 
 
 def decode_access_token(token: str) -> dict[str, Any]:
-    """Validate and decode a JWT."""
+    """Decode a JWT."""
     try:
         return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
     except jwt.ExpiredSignatureError as exc:
