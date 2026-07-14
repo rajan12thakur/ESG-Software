@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic import DetailView, FormView, ListView, TemplateView
@@ -59,7 +60,20 @@ class PlatformDashboardView(PlatformAdminRequiredMixin, TemplateView):
 class CompanyListView(PlatformAdminRequiredMixin, ListView):
     template_name = "platform_admin/company_list.html"
     context_object_name = "companies"
-    queryset = Company.objects.order_by("legal_name")
+
+    def get_queryset(self):
+        queryset = Company.objects.all()
+        query, status = self.request.GET.get("q", "").strip(), self.request.GET.get("status", "")
+        if query:
+            queryset = queryset.filter(Q(legal_name__icontains=query) | Q(display_name__icontains=query) | Q(country__icontains=query))
+        if status in {"active", "inactive", "suspended"}:
+            queryset = queryset.filter(status=status)
+        return queryset.order_by("legal_name")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"query": self.request.GET.get("q", ""), "status_filter": self.request.GET.get("status", "")})
+        return context
 
 
 class CompanyCreateView(PlatformAdminRequiredMixin, FormView):

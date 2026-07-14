@@ -8,6 +8,20 @@
     <a class="button" href="{% url 'platform-company-create' %}">Create Company</a>
 </div>
 
+<form class="panel" method="get" style="margin-bottom:18px;">
+    <div class="actions">
+        <input name="q" value="{{ query }}" placeholder="Search company or country" aria-label="Search companies">
+        <select name="status" aria-label="Company status">
+            <option value="">All statuses</option>
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+            <option value="suspended" {% if status_filter == 'suspended' %}selected{% endif %}>Suspended</option>
+        </select>
+        <button type="submit">Filter</button>
+        <a class="button secondary" href="{% url 'platform-company-list' %}">Clear</a>
+    </div>
+</form>
+
 <table>
     <thead>
         <tr>
@@ -29,7 +43,7 @@
             </tr>
         {% empty %}
             <tr>
-                <td colspan="5">No companies created yet.</td>
+                <td colspan="5">No companies match your search.</td>
             </tr>
         {% endfor %}
     </tbody>

@@ -1,0 +1,17 @@
+{% extends "accounts/base.html" %}
+{% block title %}Company Profile{% endblock %}
+{% block content %}
+<h1>Company Profile</h1>
+<form class="panel" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>{{ form.sector.label_tag }}{{ form.sector }}{{ form.sector.errors }}</div>
+    <div>{{ form.sub_sector.label_tag }}{{ form.sub_sector }}{{ form.sub_sector.errors }}</div>
+    <div>{{ form.employee_count.label_tag }}{{ form.employee_count }}{{ form.employee_count.errors }}</div>
+    <div>{{ form.annual_revenue.label_tag }}{{ form.annual_revenue }}{{ form.annual_revenue.errors }}</div>
+    <div>{{ form.listed_status.label_tag }}{{ form.listed_status }}{{ form.listed_status.errors }}</div>
+    <div>{{ form.stock_exchange.label_tag }}{{ form.stock_exchange }}{{ form.stock_exchange.errors }}</div>
+    <div>{{ form.description.label_tag }}{{ form.description }}{{ form.description.errors }}</div>
+    <div class="actions"><button type="submit">Save Company Profile</button><a class="button secondary" href="{% url 'company-dashboard' %}">Cancel</a></div>
+</form>
+{% endblock %}

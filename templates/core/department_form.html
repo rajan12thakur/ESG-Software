@@ -1,0 +1,13 @@
+{% extends "accounts/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1>
+<form class="panel" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>{{ form.name.label_tag }}{{ form.name }}{{ form.name.errors }}</div>
+    <div>{{ form.description.label_tag }}{{ form.description }}{{ form.description.errors }}</div>
+    <label style="display:flex; gap:8px; align-items:center;">{{ form.is_active }} Active</label>{{ form.is_active.errors }}
+    <div class="actions"><button type="submit">Save Department</button><a class="button secondary" href="{% url 'company-department-list' %}">Cancel</a></div>
+</form>
+{% endblock %}

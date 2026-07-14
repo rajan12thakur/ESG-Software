@@ -16,6 +16,25 @@ class CompanyRoleForm(forms.ModelForm):
         model = Role
         fields = ["name", "description", "is_active"]
 
+    def clean_name(self):
+        name = self.cleaned_data["name"].strip()
+
+        queryset = Role.objects.filter(
+            company=self.company,
+            name__iexact=name,
+        )
+
+        # Ignore current role while editing
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.exists():
+            raise forms.ValidationError(
+                "A role with this name already exists."
+            )
+
+        return name
+
     def __init__(self, *args, company, **kwargs):
         super().__init__(*args, **kwargs)
         self.company = company
@@ -84,7 +103,7 @@ class UserAccountCreateForm(forms.ModelForm):
     def __init__(self, *args, company, **kwargs):
         super().__init__(*args, **kwargs)
         self.company = company
-        self.fields["role"].queryset = Role.objects.filter(company=company, is_active=True)
+        self.fields["role"].queryset = Role.objects.filter(company=company, is_active=True, is_system_role = False)
         self.fields["department"].queryset = Department.objects.filter(company=company, is_active=True).order_by("name")
         self.fields["permissions"].queryset = Permission.objects.order_by("module", "name")
 

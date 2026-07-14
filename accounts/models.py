@@ -5,19 +5,34 @@ from django.db import models
 from core.models import Company, Department
 
 
+from django.db import models
+from django.db.models.functions import Lower
+import uuid
+
+
 class Role(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE,
         related_name="roles",
     )
+
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     is_system_role = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
-    def __str__(self) -> str:
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["company", "name"],
+                name="unique_role_name_per_company",
+            )
+        ]
+
+    def __str__(self):
         return self.name
 
 

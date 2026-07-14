@@ -1,39 +1,7 @@
 {% extends "accounts/base.html" %}
-
 {% block title %}Users{% endblock %}
-
 {% block content %}
-<div class="actions" style="justify-content: space-between; margin-bottom: 18px;">
-    <h1 style="margin: 0;">Users</h1>
-    <a class="button" href="{% url 'account-user-create' %}">Create User</a>
-</div>
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Admin</th>
-            <th>Active</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in users %}
-            <tr>
-                <td>{{ user.full_name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.role.name }}</td>
-                <td>{{ user.is_company_admin }}</td>
-                <td>{{ user.is_active }}</td>
-                <td><a href="{% url 'account-user-detail' user.id %}">Open</a></td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="6">No users created yet.</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="actions" style="justify-content:space-between; margin-bottom:18px;"><h1 style="margin:0;">Users</h1>{% if permission_flags.users_create %}<a class="button" href="{% url 'account-user-create' %}">Create User</a>{% endif %}</div>
+<form class="panel" method="get" style="margin-bottom:18px;"><div class="actions"><input name="q" value="{{ query }}" placeholder="Search name, email, or role" aria-label="Search users"><select name="active" aria-label="Active status"><option value="">All statuses</option><option value="true" {% if active_filter == 'true' %}selected{% endif %}>Active</option><option value="false" {% if active_filter == 'false' %}selected{% endif %}>Inactive</option></select><button type="submit">Filter</button><a class="button secondary" href="{% url 'account-user-list' %}">Clear</a></div></form>
+<table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Admin</th><th>Active</th><th>Actions</th></tr></thead><tbody>{% for user in users %}<tr><td>{{ user.full_name }}</td><td>{{ user.email }}</td><td>{{ user.role.name }}</td><td>{{ user.is_company_admin|yesno:"Yes,No" }}</td><td>{{ user.is_active|yesno:"Yes,No" }}</td><td>{% if permission_flags.users_view %}<a href="{% url 'account-user-detail' user.id %}">Open</a>{% endif %}</td></tr>{% empty %}<tr><td colspan="6">No users match your search.</td></tr>{% endfor %}</tbody></table>
 {% endblock %}

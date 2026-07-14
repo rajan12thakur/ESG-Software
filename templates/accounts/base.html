@@ -170,11 +170,11 @@
             <strong>{{ request.company }}</strong>
             <nav>
                 <a href="{% url 'company-dashboard' %}">Dashboard</a>
-                <a href="{% url 'account-user-list' %}">Users</a>
-                <a href="{% url 'account-role-list' %}">Roles</a>
-                <a href="{% url 'company-department-list' %}">Departments</a>
-                <a href="{% url 'company-unit-list' %}">Organization Units</a>
-                <a href="{% url 'company-profile' %}">Company Profile</a>
+                {% if permission_flags.users_view %}<a href="{% url 'account-user-list' %}">Users</a>{% endif %}
+                {% if permission_flags.roles_view %}<a href="{% url 'account-role-list' %}">Roles</a>{% endif %}
+                {% if permission_flags.departments_view %}<a href="{% url 'company-department-list' %}">Departments</a>{% endif %}
+                {% if permission_flags.organization_units_view %}<a href="{% url 'company-unit-list' %}">Organization Units</a>{% endif %}
+                {% if permission_flags.company_profile_edit or permission_flags.company_profile_update %}<a href="{% url 'company-profile' %}">Company Profile</a>{% endif %}
                 <form method="post" action="{% url 'company-logout' %}">
                     {% csrf_token %}
                     <button class="secondary" type="submit">Logout</button>

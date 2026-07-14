@@ -1,16 +1,19 @@
 {% extends "platform_admin/base.html" %}
-
 {% block title %}Create Company{% endblock %}
-
 {% block content %}
 <h1>Create Company</h1>
-
 <form class="panel" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <div class="actions">
-        <button type="submit">Create</button>
-        <a class="button secondary" href="{% url 'platform-company-list' %}">Cancel</a>
-    </div>
+    {{ form.non_field_errors }}
+    <div>{{ form.legal_name.label_tag }}{{ form.legal_name }}{{ form.legal_name.errors }}</div>
+    <div>{{ form.display_name.label_tag }}{{ form.display_name }}{{ form.display_name.errors }}</div>
+    <div>{{ form.registration_number.label_tag }}{{ form.registration_number }}{{ form.registration_number.errors }}</div>
+    <div>{{ form.industry.label_tag }}{{ form.industry }}{{ form.industry.errors }}</div>
+    <div>{{ form.country.label_tag }}{{ form.country }}{{ form.country.errors }}</div>
+    <div>{{ form.currency.label_tag }}{{ form.currency }}{{ form.currency.errors }}</div>
+    <div>{{ form.timezone.label_tag }}{{ form.timezone }}{{ form.timezone.errors }}</div>
+    <div>{{ form.status.label_tag }}{{ form.status }}{{ form.status.errors }}</div>
+    <label style="display:flex; gap:8px; align-items:center;">{{ form.is_demo_tenant }} {{ form.is_demo_tenant.label }}</label>{{ form.is_demo_tenant.errors }}
+    <div class="actions"><button type="submit">Create</button><a class="button secondary" href="{% url 'platform-company-list' %}">Cancel</a></div>
 </form>
 {% endblock %}

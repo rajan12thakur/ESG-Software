@@ -130,11 +130,9 @@
         <div class="bar">
             <h1>{{ company }}</h1>
             <div class="actions">
-                {% if user_account.is_company_admin %}
-                    <a href="{% url 'account-user-list' %}">Manage Users</a>
-                    <a href="{% url 'account-role-list' %}">Manage Roles</a>
-                    <a href="{% url 'company-department-list' %}">Manage Organization</a>
-                {% endif %}
+                {% if permission_flags.users_view %}<a href="{% url 'account-user-list' %}">Manage Users</a>{% endif %}
+                {% if permission_flags.roles_view %}<a href="{% url 'account-role-list' %}">Manage Roles</a>{% endif %}
+                {% if permission_flags.departments_view or permission_flags.organization_units_view %}<a href="{% url 'company-department-list' %}">Manage Organization</a>{% endif %}
                 <form method="post" action="{% url 'company-logout' %}">
                     {% csrf_token %}
                     <button type="submit">Logout</button>

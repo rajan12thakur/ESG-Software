@@ -1,0 +1,20 @@
+{% extends "accounts/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1>
+<form class="panel" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>{{ form.parent_unit.label_tag }}{{ form.parent_unit }}{{ form.parent_unit.errors }}</div>
+    <div>{{ form.name.label_tag }}{{ form.name }}{{ form.name.errors }}</div>
+    <div>{{ form.unit_type.label_tag }}{{ form.unit_type }}{{ form.unit_type.errors }}</div>
+    <div>{{ form.country.label_tag }}{{ form.country }}{{ form.country.errors }}</div>
+    <div>{{ form.state.label_tag }}{{ form.state }}{{ form.state.errors }}</div>
+    <div>{{ form.city.label_tag }}{{ form.city }}{{ form.city.errors }}</div>
+    <div>{{ form.ownership_percentage.label_tag }}{{ form.ownership_percentage }}{{ form.ownership_percentage.errors }}</div>
+    <label style="display:flex; gap:8px; align-items:center;">{{ form.operational_control }} {{ form.operational_control.label }}</label>{{ form.operational_control.errors }}
+    <label style="display:flex; gap:8px; align-items:center;">{{ form.financial_control }} {{ form.financial_control.label }}</label>{{ form.financial_control.errors }}
+    <label style="display:flex; gap:8px; align-items:center;">{{ form.is_active }} Active</label>{{ form.is_active.errors }}
+    <div class="actions"><button type="submit">Save Organization Unit</button><a class="button secondary" href="{% url 'company-unit-list' %}">Cancel</a></div>
+</form>
+{% endblock %}

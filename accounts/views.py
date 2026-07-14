@@ -1,7 +1,9 @@
 from collections import OrderedDict
 
+from django import forms
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.views.generic import DetailView, FormView, ListView, TemplateView
@@ -23,6 +25,7 @@ PERMISSION_CATALOG = {
     "Departments": ("View", "Create", "Edit", "Delete", "Update"),
     "Organization Units": ("View", "Create", "Edit", "Delete", "Update"),
     "Facilities": ("View", "Create", "Edit", "Delete", "Update"),
+    "Company Profile": ("View", "Create", "Edit", "Delete", "Update"),
     "ESG Data": ("View", "Create", "Edit", "Delete", "Update"),
     "Reports": ("View",),
 }
@@ -70,7 +73,18 @@ class UserListView(CompanyObjectMixin, ListView):
     required_permission = "users.view"
 
     def get_queryset(self):
-        return UserAccount.objects.filter(company=self.request.company).select_related("role").order_by("first_name", "email")
+        queryset = UserAccount.objects.filter(company=self.request.company).select_related("role")
+        query, active = self.request.GET.get("q", "").strip(), self.request.GET.get("active", "")
+        if query:
+            queryset = queryset.filter(Q(first_name__icontains=query) | Q(last_name__icontains=query) | Q(email__icontains=query) | Q(role__name__icontains=query))
+        if active in {"true", "false"}:
+            queryset = queryset.filter(is_active=active == "true")
+        return queryset.order_by("first_name", "email")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"query": self.request.GET.get("q", ""), "active_filter": self.request.GET.get("active", "")})
+        return context
 
 
 class UserCreateView(CompanyObjectMixin, FormView):
@@ -178,7 +192,18 @@ class RoleListView(CompanyObjectMixin, ListView):
     required_permission = "roles.view"
 
     def get_queryset(self):
-        return Role.objects.filter(company=self.request.company).prefetch_related("role_permissions__permission").order_by("name")
+        queryset = Role.objects.filter(company=self.request.company).prefetch_related("role_permissions__permission")
+        query, active = self.request.GET.get("q", "").strip(), self.request.GET.get("active", "")
+        if query:
+            queryset = queryset.filter(Q(name__icontains=query) | Q(description__icontains=query))
+        if active in {"true", "false"}:
+            queryset = queryset.filter(is_active=active == "true")
+        return queryset.order_by("name")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"query": self.request.GET.get("q", ""), "active_filter": self.request.GET.get("active", "")})
+        return context
 
 
 class RoleCreateView(CompanyObjectMixin, FormView):
@@ -208,6 +233,23 @@ class RoleCreateView(CompanyObjectMixin, FormView):
         form.save_permissions()
         messages.success(self.request, "Role created successfully.")
         return redirect("account-role-list")
+    def clean_name(self):
+        name = self.cleaned_data["name"].strip()
+
+        queryset = Role.objects.filter(
+            company=self.company,
+            name__iexact=name,
+        )
+
+        # Ignore the current role while editing
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.exists():
+            raise forms.ValidationError(
+                "A role with this name already exists."
+            )
+        return name
 
 
 class RoleUpdateView(CompanyObjectMixin, FormView):

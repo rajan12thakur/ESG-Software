@@ -1,12 +1,7 @@
 {% extends "accounts/base.html" %}
 {% block title %}Facilities — {{ unit.name }}{% endblock %}
 {% block content %}
-<div class="actions" style="justify-content:space-between; margin-bottom:18px;">
-    <div><h1 style="margin:0;">Facilities</h1><p>{{ unit.name }}</p></div>
-    <div class="actions"><a class="button secondary" href="{% url 'company-unit-list' %}">Organization Units</a><a class="button" href="{% url 'company-unit-facility-create' unit.id %}">Create Facility</a></div>
-</div>
-<table><thead><tr><th>Name</th><th>Type</th><th>Location</th><th>Active</th><th></th></tr></thead><tbody>
-{% for facility in facilities %}<tr><td>{{ facility.name }}</td><td>{{ facility.facility_type|default:"—" }}</td><td>{{ facility.city|default:"" }}{% if facility.city and facility.country %}, {% endif %}{{ facility.country|default:"—" }}</td><td>{{ facility.is_active }}</td><td><a href="{% url 'company-unit-facility-update' unit.id facility.id %}">Edit</a></td></tr>
-{% empty %}<tr><td colspan="5">No facilities have been created for this organization unit.</td></tr>{% endfor %}
-</tbody></table>
+<div class="actions" style="justify-content:space-between; margin-bottom:18px;"><div><h1 style="margin:0;">Facilities</h1><p>{{ unit.name }}</p></div><div class="actions"><a class="button secondary" href="{% url 'company-unit-list' %}">Organization Units</a>{% if permission_flags.facilities_create %}<a class="button" href="{% url 'company-unit-facility-create' unit.id %}">Create Facility</a>{% endif %}</div></div>
+<form class="panel" method="get" style="margin-bottom:18px;"><div class="actions"><input name="q" value="{{ query }}" placeholder="Search name, type, or location" aria-label="Search facilities"><select name="active" aria-label="Active status"><option value="">All statuses</option><option value="true" {% if active_filter == 'true' %}selected{% endif %}>Active</option><option value="false" {% if active_filter == 'false' %}selected{% endif %}>Inactive</option></select><button type="submit">Filter</button><a class="button secondary" href="{% url 'company-unit-facility-list' unit.id %}">Clear</a></div></form>
+<table><thead><tr><th>Name</th><th>Type</th><th>Location</th><th>Active</th><th>Actions</th></tr></thead><tbody>{% for facility in facilities %}<tr><td>{{ facility.name }}</td><td>{{ facility.facility_type|default:"—" }}</td><td>{{ facility.city|default:"" }}{% if facility.city and facility.country %}, {% endif %}{{ facility.country|default:"—" }}</td><td>{{ facility.is_active|yesno:"Yes,No" }}</td><td class="actions">{% if permission_flags.facilities_edit or permission_flags.facilities_update %}<a href="{% url 'company-unit-facility-update' unit.id facility.id %}">Edit</a>{% endif %}{% if permission_flags.facilities_delete %}<form method="post" action="{% url 'company-unit-facility-delete' unit.id facility.id %}" onsubmit="return confirm('Delete this facility?');">{% csrf_token %}<button class="danger" type="submit">Delete</button></form>{% endif %}</td></tr>{% empty %}<tr><td colspan="5">No facilities match your search.</td></tr>{% endfor %}</tbody></table>
 {% endblock %}
