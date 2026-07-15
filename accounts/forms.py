@@ -101,12 +101,14 @@ class BaseUserAccountForm(forms.ModelForm):
                 required=False,
                 label=f"{role.name}: organization units",
                 help_text="Leave blank to avoid restricting this assignment by organization unit.",
+                widget=forms.CheckboxSelectMultiple,
             )
             self.fields[facility_field_name] = forms.ModelMultipleChoiceField(
                 queryset=self.facility_queryset,
                 required=False,
                 label=f"{role.name}: facilities",
                 help_text="Leave blank to avoid restricting this assignment by facility.",
+                widget=forms.CheckboxSelectMultiple,
             )
             self._role_scope_field_groups.append(
                 RoleScopeFieldGroup(
@@ -168,12 +170,20 @@ class BaseUserAccountForm(forms.ModelForm):
         selected_role_ids = set(self._selected_role_ids_for_display())
         groups = []
         for group in self._role_scope_field_groups:
+            org_unit_selected_ids = self._selected_ids_for_scope_field(
+                group.org_unit_field_name
+            )
+            facility_selected_ids = self._selected_ids_for_scope_field(
+                group.facility_field_name
+            )
             groups.append(
                 {
                     "role": group.role,
                     "selected": str(group.role.id) in selected_role_ids,
                     "org_units_field": self[group.org_unit_field_name],
                     "facilities_field": self[group.facility_field_name],
+                    "org_unit_rows": self._organization_unit_rows(org_unit_selected_ids),
+                    "facility_sections": self._facility_sections(facility_selected_ids),
                 }
             )
         return groups
@@ -183,6 +193,76 @@ class BaseUserAccountForm(forms.ModelForm):
             return [role_id for role_id in self.data.getlist("roles") if role_id]
         initial = self.fields["roles"].initial or []
         return [str(role_id) for role_id in initial]
+
+    def _selected_ids_for_scope_field(self, field_name):
+        if self.is_bound:
+            return {
+                str(value)
+                for value in self.data.getlist(field_name)
+                if value
+            }
+
+        initial = self.fields[field_name].initial or []
+        return {str(value) for value in initial}
+
+    def _organization_unit_rows(self, selected_ids):
+        rows = []
+        units_by_parent_id = {}
+        for unit in self.org_unit_queryset:
+            units_by_parent_id.setdefault(unit.parent_unit_id, []).append(unit)
+
+        for siblings in units_by_parent_id.values():
+            siblings.sort(key=lambda item: item.name.lower())
+
+        def walk(parent_id, depth):
+            for unit in units_by_parent_id.get(parent_id, []):
+                rows.append(
+                    {
+                        "id": str(unit.id),
+                        "name": unit.name,
+                        "depth": depth,
+                        "indent_steps": range(depth),
+                        "meta": unit.unit_type,
+                        "checked": str(unit.id) in selected_ids,
+                    }
+                )
+                walk(unit.id, depth + 1)
+
+        walk(None, 0)
+        return rows
+
+    def _facility_sections(self, selected_ids):
+        ordered_units = self._organization_unit_rows(set())
+        facilities_by_unit_id = {}
+        for facility in self.facility_queryset:
+            facilities_by_unit_id.setdefault(str(facility.organization_unit_id), []).append(facility)
+
+        for facilities in facilities_by_unit_id.values():
+            facilities.sort(key=lambda item: item.name.lower())
+
+        sections = []
+        for row in ordered_units:
+            facilities = facilities_by_unit_id.get(row["id"], [])
+            if not facilities:
+                continue
+            sections.append(
+                {
+                    "name": row["name"],
+                    "depth": row["depth"],
+                    "indent_steps": range(row["depth"]),
+                    "facility_indent_steps": range(row["depth"] + 1),
+                    "facilities": [
+                        {
+                            "id": str(facility.id),
+                            "name": facility.name,
+                            "meta": facility.facility_type,
+                            "checked": str(facility.id) in selected_ids,
+                        }
+                        for facility in facilities
+                    ],
+                }
+            )
+        return sections
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()

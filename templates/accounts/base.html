@@ -115,6 +115,25 @@
 
         .permission-checklist ul { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
         .permission-checklist li label { margin: 0; font-weight: 400; }
+        .scope-panel__header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+        .scope-badge { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 999px; background: #edf1eb; color: var(--muted); font-size: 12px; font-weight: 700; }
+        .scope-panel--selected { background: #f7fbf7; }
+        .scope-panel--inactive { background: #fbfcfa; }
+        .scope-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+        .scope-card { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 14px; }
+        .scope-card__title { font-weight: 700; margin-bottom: 6px; }
+        .scope-tree { margin-top: 12px; display: grid; gap: 8px; }
+        .scope-tree__item { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fbfcfa; }
+        .scope-tree__item input { margin-top: 3px; }
+        .scope-tree__indent { display: inline-flex; align-items: stretch; gap: 8px; min-width: 0; flex-shrink: 0; }
+        .scope-tree__indent-step { width: 10px; min-width: 10px; border-left: 1px solid var(--line); }
+        .scope-tree__content { display: grid; gap: 2px; }
+        .scope-tree__name { font-weight: 600; }
+        .scope-tree__meta { color: var(--muted); font-size: 12px; }
+        .scope-tree__empty { margin: 0; color: var(--muted); }
+        .scope-section { display: grid; gap: 8px; }
+        .scope-section__title { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+        .scope-tree--sections .scope-tree__item { background: #f8faf7; }
         small { color: var(--muted); }
 
         button,

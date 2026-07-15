@@ -16,97 +16,97 @@ from core.models import Company, CompanyProfile, Department, Facility, Organizat
 
 PASSWORD_ENV_VAR = "MODULE1_DEMO_PASSWORD"
 SEED_REGISTRATION_NUMBERS = {
-    "alpha": "SEED-MODULE1-ALPHA",
-    "beta": "SEED-MODULE1-BETA",
+    "aurelia": "SEED-MODULE1-AURELIA",
+    "nexora": "SEED-MODULE1-NEXORA",
 }
 
 COMPANY_SPECS = {
-    "alpha": {
+    "aurelia": {
         "company": {
-            "legal_name": "Module 1 Demo Alpha LLC",
-            "display_name": "Module 1 Demo Alpha",
-            "tenant_code": "module1-alpha",
-            "registration_number": SEED_REGISTRATION_NUMBERS["alpha"],
-            "industry": "Manufacturing",
-            "country": "United States",
-            "currency": "USD",
-            "timezone": "America/New_York",
+            "legal_name": "Aurelia Precision Components Private Limited",
+            "display_name": "Aurelia Precision Components",
+            "tenant_code": "aurelia-precision",
+            "registration_number": SEED_REGISTRATION_NUMBERS["aurelia"],
+            "industry": "Automotive Components Manufacturing",
+            "country": "India",
+            "currency": "INR",
+            "timezone": "Asia/Kolkata",
             "status": "active",
             "is_demo_tenant": True,
         },
         "profile": {
             "sector": "Industrials",
-            "sub_sector": "Manufacturing",
-            "employee_count": 1200,
-            "annual_revenue": "85000000.00",
+            "sub_sector": "Auto Components",
+            "employee_count": 1850,
+            "annual_revenue": "6850000000.00",
             "listed_status": "Private",
             "stock_exchange": "",
-            "description": "Development seed tenant for current Module 1 RBAC and scope testing.",
+            "description": "Fictional automotive-components manufacturer used for RBAC, organization hierarchy, and facility-scope testing.",
         },
         "departments": [
-            ("Operations", "Operational delivery and execution."),
-            ("Sustainability", "ESG program ownership."),
+            ("Operations", "Production planning, plant operations, quality coordination, and delivery execution."),
+            ("Sustainability", "Environmental, social, governance, and sustainability reporting ownership."),
         ],
         "organization_units": [
             {
-                "name": "Alpha Group",
+                "name": "Aurelia Corporate Group",
                 "parent": None,
-                "unit_type": "Holding",
-                "country": "United States",
-                "state": "New York",
-                "city": "New York",
+                "unit_type": "Corporate Headquarters",
+                "country": "India",
+                "state": "Maharashtra",
+                "city": "Pune",
             },
             {
-                "name": "Alpha Manufacturing",
-                "parent": "Alpha Group",
-                "unit_type": "Plant Division",
-                "country": "United States",
-                "state": "Ohio",
-                "city": "Cleveland",
+                "name": "Western Manufacturing Division",
+                "parent": "Aurelia Corporate Group",
+                "unit_type": "Manufacturing Division",
+                "country": "India",
+                "state": "Maharashtra",
+                "city": "Pune",
             },
             {
-                "name": "Alpha Logistics",
-                "parent": "Alpha Group",
-                "unit_type": "Distribution",
-                "country": "United States",
-                "state": "Illinois",
-                "city": "Chicago",
+                "name": "Supply Chain and Distribution Division",
+                "parent": "Aurelia Corporate Group",
+                "unit_type": "Supply Chain Division",
+                "country": "India",
+                "state": "Maharashtra",
+                "city": "Mumbai",
             },
         ],
         "facilities": [
             {
-                "name": "Alpha Plant 1",
-                "organization_unit": "Alpha Manufacturing",
+                "name": "Chakan Components Plant",
+                "organization_unit": "Western Manufacturing Division",
                 "facility_type": "Plant",
-                "country": "United States",
-                "state": "Ohio",
-                "city": "Cleveland",
+                "country": "India",
+                "state": "Maharashtra",
+                "city": "Pune",
             },
             {
-                "name": "Alpha Plant 2",
-                "organization_unit": "Alpha Manufacturing",
+                "name": "Nashik Machining Plant",
+                "organization_unit": "Western Manufacturing Division",
                 "facility_type": "Plant",
-                "country": "United States",
-                "state": "Ohio",
-                "city": "Toledo",
+                "country": "India",
+                "state": "Maharashtra",
+                "city": "Nashik",
             },
             {
-                "name": "Alpha Logistics Hub",
-                "organization_unit": "Alpha Logistics",
-                "facility_type": "Warehouse",
-                "country": "United States",
-                "state": "Illinois",
-                "city": "Chicago",
+                "name": "Bhiwandi Distribution Centre",
+                "organization_unit": "Supply Chain and Distribution Division",
+                "facility_type": "Distribution Centre",
+                "country": "India",
+                "state": "Maharashtra",
+                "city": "Bhiwandi",
             },
         ],
         "roles": {
             "Company Admin": {
-                "description": "Module 1 demo company administrator.",
+                "description": "Full-access tenant administrator responsible for company configuration and user administration.",
                 "is_system_role": True,
                 "permissions": list(CANONICAL_PERMISSION_CODES),
             },
-            "Module 1 Unrestricted Operator": {
-                "description": "Unrestricted tenant operator for organization-area testing.",
+            "Operations Platform Manager": {
+                "description": "Unrestricted operations manager with department, organization-unit, and facility administration access.",
                 "permissions": [
                     "departments.view",
                     "departments.create",
@@ -119,32 +119,32 @@ COMPANY_SPECS = {
                     "facilities.edit",
                 ],
             },
-            "Module 1 Additive Manufacturing": {
-                "description": "Additive scope role for Alpha Manufacturing.",
+            "Manufacturing Division Viewer": {
+                "description": "Read-only organization-unit access for the Western Manufacturing Division.",
                 "permissions": ["organization_units.view"],
             },
-            "Module 1 Additive Logistics": {
-                "description": "Additive scope role for Alpha Logistics.",
+            "Distribution Division Viewer": {
+                "description": "Read-only organization-unit access for the Supply Chain and Distribution Division.",
                 "permissions": ["organization_units.view"],
             },
-            "Module 1 ORG_UNIT Scoped": {
-                "description": "Scoped to one organization unit.",
+            "Organization Unit Manager": {
+                "description": "Create, view, and edit access restricted to an assigned organization unit.",
                 "permissions": [
                     "organization_units.view",
                     "organization_units.create",
                     "organization_units.edit",
                 ],
             },
-            "Module 1 FACILITY Scoped": {
-                "description": "Scoped to one facility.",
+            "Facility Operations Manager": {
+                "description": "Create, view, and edit access restricted to an assigned facility.",
                 "permissions": [
                     "facilities.view",
                     "facilities.create",
                     "facilities.edit",
                 ],
             },
-            "Module 1 Combined Scoped": {
-                "description": "Requires both matching organization unit and facility scopes.",
+            "Plant Compliance Coordinator": {
+                "description": "Facility editing access requiring both the assigned manufacturing division and plant scope.",
                 "permissions": [
                     "facilities.view",
                     "facilities.edit",
@@ -153,159 +153,159 @@ COMPANY_SPECS = {
         },
         "users": [
             {
-                "email": "alpha.admin@module1-demo.invalid",
-                "employee_code": "M1DEMO-ALPHA-ADMIN",
-                "first_name": "Alpha",
-                "last_name": "Admin",
-                "phone": "+1-555-0100",
+                "email": "ananya.mehta@aurelia-demo.invalid",
+                "employee_code": "APCL-ADM-001",
+                "first_name": "Ananya",
+                "last_name": "Mehta",
+                "phone": "+91-90000-00001",
                 "department": "Operations",
                 "is_company_admin": True,
                 "roles": [{"name": "Company Admin"}],
             },
             {
-                "email": "alpha.unrestricted@module1-demo.invalid",
-                "employee_code": "M1DEMO-ALPHA-UNRESTRICTED",
-                "first_name": "Alpha",
-                "last_name": "Unrestricted",
-                "phone": "+1-555-0101",
+                "email": "rohan.kulkarni@aurelia-demo.invalid",
+                "employee_code": "APCL-OPS-014",
+                "first_name": "Rohan",
+                "last_name": "Kulkarni",
+                "phone": "+91-90000-00002",
                 "department": "Operations",
-                "roles": [{"name": "Module 1 Unrestricted Operator"}],
+                "roles": [{"name": "Operations Platform Manager"}],
             },
             {
-                "email": "alpha.additive@module1-demo.invalid",
-                "employee_code": "M1DEMO-ALPHA-ADDITIVE",
-                "first_name": "Alpha",
-                "last_name": "Additive",
-                "phone": "+1-555-0102",
+                "email": "kavya.iyer@aurelia-demo.invalid",
+                "employee_code": "APCL-ESG-008",
+                "first_name": "Kavya",
+                "last_name": "Iyer",
+                "phone": "+91-90000-00003",
                 "department": "Sustainability",
                 "roles": [
                     {
-                        "name": "Module 1 Additive Manufacturing",
-                        "scopes": {SCOPE_TYPE_ORG_UNIT: ["Alpha Manufacturing"]},
+                        "name": "Manufacturing Division Viewer",
+                        "scopes": {SCOPE_TYPE_ORG_UNIT: ["Western Manufacturing Division"]},
                     },
                     {
-                        "name": "Module 1 Additive Logistics",
-                        "scopes": {SCOPE_TYPE_ORG_UNIT: ["Alpha Logistics"]},
+                        "name": "Distribution Division Viewer",
+                        "scopes": {SCOPE_TYPE_ORG_UNIT: ["Supply Chain and Distribution Division"]},
                     },
                 ],
             },
             {
-                "email": "alpha.orgunit@module1-demo.invalid",
-                "employee_code": "M1DEMO-ALPHA-ORGUNIT",
-                "first_name": "Alpha",
-                "last_name": "OrgUnit",
-                "phone": "+1-555-0103",
+                "email": "vikram.patil@aurelia-demo.invalid",
+                "employee_code": "APCL-MFG-021",
+                "first_name": "Vikram",
+                "last_name": "Patil",
+                "phone": "+91-90000-00004",
                 "department": "Operations",
                 "roles": [
                     {
-                        "name": "Module 1 ORG_UNIT Scoped",
-                        "scopes": {SCOPE_TYPE_ORG_UNIT: ["Alpha Manufacturing"]},
+                        "name": "Organization Unit Manager",
+                        "scopes": {SCOPE_TYPE_ORG_UNIT: ["Western Manufacturing Division"]},
                     }
                 ],
             },
             {
-                "email": "alpha.facility@module1-demo.invalid",
-                "employee_code": "M1DEMO-ALPHA-FACILITY",
-                "first_name": "Alpha",
-                "last_name": "Facility",
-                "phone": "+1-555-0104",
+                "email": "sneha.deshmukh@aurelia-demo.invalid",
+                "employee_code": "APCL-PLT-032",
+                "first_name": "Sneha",
+                "last_name": "Deshmukh",
+                "phone": "+91-90000-00005",
                 "department": "Operations",
                 "roles": [
                     {
-                        "name": "Module 1 FACILITY Scoped",
-                        "scopes": {SCOPE_TYPE_FACILITY: ["Alpha Plant 1"]},
+                        "name": "Facility Operations Manager",
+                        "scopes": {SCOPE_TYPE_FACILITY: ["Chakan Components Plant"]},
                     }
                 ],
             },
             {
-                "email": "alpha.combined@module1-demo.invalid",
-                "employee_code": "M1DEMO-ALPHA-COMBINED",
-                "first_name": "Alpha",
-                "last_name": "Combined",
-                "phone": "+1-555-0105",
+                "email": "arjun.rao@aurelia-demo.invalid",
+                "employee_code": "APCL-CMP-011",
+                "first_name": "Arjun",
+                "last_name": "Rao",
+                "phone": "+91-90000-00006",
                 "department": "Operations",
                 "roles": [
                     {
-                        "name": "Module 1 Combined Scoped",
+                        "name": "Plant Compliance Coordinator",
                         "scopes": {
-                            SCOPE_TYPE_ORG_UNIT: ["Alpha Manufacturing"],
-                            SCOPE_TYPE_FACILITY: ["Alpha Plant 1"],
+                            SCOPE_TYPE_ORG_UNIT: ["Western Manufacturing Division"],
+                            SCOPE_TYPE_FACILITY: ["Chakan Components Plant"],
                         },
                     }
                 ],
             },
         ],
     },
-    "beta": {
+    "nexora": {
         "company": {
-            "legal_name": "Module 1 Demo Beta LLC",
-            "display_name": "Module 1 Demo Beta",
-            "tenant_code": "module1-beta",
-            "registration_number": SEED_REGISTRATION_NUMBERS["beta"],
-            "industry": "Logistics",
-            "country": "United States",
-            "currency": "USD",
-            "timezone": "America/Chicago",
+            "legal_name": "Nexora Freight and Logistics Private Limited",
+            "display_name": "Nexora Freight and Logistics",
+            "tenant_code": "nexora-logistics",
+            "registration_number": SEED_REGISTRATION_NUMBERS["nexora"],
+            "industry": "Logistics and Transportation",
+            "country": "India",
+            "currency": "INR",
+            "timezone": "Asia/Kolkata",
             "status": "active",
             "is_demo_tenant": True,
         },
         "profile": {
             "sector": "Industrials",
-            "sub_sector": "Transportation",
-            "employee_count": 450,
-            "annual_revenue": "22000000.00",
+            "sub_sector": "Integrated Logistics",
+            "employee_count": 620,
+            "annual_revenue": "1850000000.00",
             "listed_status": "Private",
             "stock_exchange": "",
-            "description": "Second development seed tenant for tenant-isolation testing.",
+            "description": "Fictional logistics provider used to validate tenant isolation and read-only operational access.",
         },
         "departments": [
-            ("Operations", "Operational execution."),
-            ("Compliance", "Regulatory and ESG oversight."),
+            ("Operations", "Fleet coordination, freight movement, terminal operations, and customer delivery execution."),
+            ("Compliance", "Transport compliance, safety controls, regulatory reporting, and ESG oversight."),
         ],
         "organization_units": [
             {
-                "name": "Beta Holdings",
+                "name": "Nexora Corporate Office",
                 "parent": None,
-                "unit_type": "Holding",
-                "country": "United States",
-                "state": "Texas",
-                "city": "Dallas",
+                "unit_type": "Corporate Headquarters",
+                "country": "India",
+                "state": "Karnataka",
+                "city": "Bengaluru",
             },
             {
-                "name": "Beta South Region",
-                "parent": "Beta Holdings",
-                "unit_type": "Regional Operations",
-                "country": "United States",
-                "state": "Texas",
-                "city": "Houston",
+                "name": "South India Logistics Region",
+                "parent": "Nexora Corporate Office",
+                "unit_type": "Regional Logistics Operations",
+                "country": "India",
+                "state": "Tamil Nadu",
+                "city": "Chennai",
             },
         ],
         "facilities": [
             {
-                "name": "Beta Terminal 1",
-                "organization_unit": "Beta South Region",
-                "facility_type": "Terminal",
-                "country": "United States",
-                "state": "Texas",
-                "city": "Houston",
+                "name": "Chennai Freight Terminal",
+                "organization_unit": "South India Logistics Region",
+                "facility_type": "Freight Terminal",
+                "country": "India",
+                "state": "Tamil Nadu",
+                "city": "Chennai",
             },
             {
-                "name": "Beta Warehouse 1",
-                "organization_unit": "Beta South Region",
+                "name": "Bengaluru Distribution Warehouse",
+                "organization_unit": "South India Logistics Region",
                 "facility_type": "Warehouse",
-                "country": "United States",
-                "state": "Texas",
-                "city": "Austin",
+                "country": "India",
+                "state": "Karnataka",
+                "city": "Bengaluru",
             },
         ],
         "roles": {
             "Company Admin": {
-                "description": "Module 1 demo company administrator.",
+                "description": "Full-access tenant administrator responsible for company configuration and user administration.",
                 "is_system_role": True,
                 "permissions": list(CANONICAL_PERMISSION_CODES),
             },
-            "Module 1 Beta Unrestricted Operator": {
-                "description": "Unrestricted operator for tenant isolation testing.",
+            "Logistics Read-Only Operator": {
+                "description": "Tenant-wide read-only access to departments, organization units, and facilities for isolation testing.",
                 "permissions": [
                     "departments.view",
                     "organization_units.view",
@@ -315,23 +315,23 @@ COMPANY_SPECS = {
         },
         "users": [
             {
-                "email": "beta.admin@module1-demo.invalid",
-                "employee_code": "M1DEMO-BETA-ADMIN",
-                "first_name": "Beta",
-                "last_name": "Admin",
-                "phone": "+1-555-0200",
+                "email": "priya.nair@nexora-demo.invalid",
+                "employee_code": "NFL-ADM-001",
+                "first_name": "Priya",
+                "last_name": "Nair",
+                "phone": "+91-90000-00101",
                 "department": "Operations",
                 "is_company_admin": True,
                 "roles": [{"name": "Company Admin"}],
             },
             {
-                "email": "beta.unrestricted@module1-demo.invalid",
-                "employee_code": "M1DEMO-BETA-UNRESTRICTED",
-                "first_name": "Beta",
-                "last_name": "Operator",
-                "phone": "+1-555-0201",
+                "email": "karan.shah@nexora-demo.invalid",
+                "employee_code": "NFL-CMP-017",
+                "first_name": "Karan",
+                "last_name": "Shah",
+                "phone": "+91-90000-00102",
                 "department": "Compliance",
-                "roles": [{"name": "Module 1 Beta Unrestricted Operator"}],
+                "roles": [{"name": "Logistics Read-Only Operator"}],
             },
         ],
     },
@@ -339,7 +339,7 @@ COMPANY_SPECS = {
 
 
 class Command(BaseCommand):
-    help = "Seed two demo tenants and current Module 1 RBAC/scope data for development testing."
+    help = "Seed two realistic fictional tenants and current Module 1 RBAC/scope data for development testing."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -571,7 +571,7 @@ class Command(BaseCommand):
         raise CommandError(f"Unsupported scope type in seed spec: {scope_type}")
 
     def print_summary(self, seeded):
-        self.stdout.write(self.style.SUCCESS("Seeded current Module 1 demo data."))
+        self.stdout.write(self.style.SUCCESS("Seeded realistic Module 1 demo data."))
         for payload in seeded.values():
             company = payload["company"]
             self.stdout.write(f"Company: {company.display_name or company.legal_name} ({company.registration_number})")

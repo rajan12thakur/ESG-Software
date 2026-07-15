@@ -300,26 +300,26 @@ class Module1DevelopmentSeedCommandTests(TestCase):
     def test_successful_seed_execution(self):
         output = self.run_seed()
 
-        self.assertIn("Module 1 Demo Alpha", output)
-        self.assertIn("tenant_code=module1-alpha", output)
-        self.assertIn("alpha.unrestricted@module1-demo.invalid", output)
+        self.assertIn("Aurelia Precision Components", output)
+        self.assertIn("tenant_code=aurelia-precision", output)
+        self.assertIn("rohan.kulkarni@aurelia-demo.invalid", output)
         self.assertNotIn(self.password, output)
         self.assertEqual(
             Company.objects.filter(
-                registration_number__in=["SEED-MODULE1-ALPHA", "SEED-MODULE1-BETA"],
+                registration_number__in=["SEED-MODULE1-AURELIA", "SEED-MODULE1-NEXORA"],
                 is_demo_tenant=True,
             ).count(),
             2,
         )
         self.assertEqual(
             Company.objects.filter(
-                tenant_code__in=["module1-alpha", "module1-beta"],
+                tenant_code__in=["aurelia-precision", "nexora-logistics"],
             ).count(),
             2,
         )
         self.assertEqual(CompanyProfile.objects.count(), 2)
         self.assertEqual(
-            UserAccount.objects.filter(email__endswith="@module1-demo.invalid").count(),
+            UserAccount.objects.filter(email__regex=r"@(aurelia|nexora)-demo\.invalid$").count(),
             8,
         )
 
@@ -369,72 +369,72 @@ class Module1DevelopmentSeedCommandTests(TestCase):
 
     def test_correct_user_role_assignments_are_seeded(self):
         self.run_seed()
-        additive_user = UserAccount.objects.get(email="alpha.additive@module1-demo.invalid")
-        combined_user = UserAccount.objects.get(email="alpha.combined@module1-demo.invalid")
+        additive_user = UserAccount.objects.get(email="kavya.iyer@aurelia-demo.invalid")
+        combined_user = UserAccount.objects.get(email="arjun.rao@aurelia-demo.invalid")
 
         self.assertCountEqual(
             additive_user.user_roles.select_related("role").values_list("role__name", flat=True),
             [
-                "Module 1 Additive Manufacturing",
-                "Module 1 Additive Logistics",
+                "Manufacturing Division Viewer",
+                "Distribution Division Viewer",
             ],
         )
         self.assertCountEqual(
             combined_user.user_roles.select_related("role").values_list("role__name", flat=True),
-            ["Module 1 Combined Scoped"],
+            ["Plant Compliance Coordinator"],
         )
 
     def test_correct_user_role_scope_assignments_are_seeded(self):
         self.run_seed()
-        manufacturing_unit = OrganizationUnit.objects.get(name="Alpha Manufacturing")
-        logistics_unit = OrganizationUnit.objects.get(name="Alpha Logistics")
-        alpha_plant_1 = Facility.objects.get(name="Alpha Plant 1")
+        manufacturing_unit = OrganizationUnit.objects.get(name="Western Manufacturing Division")
+        logistics_unit = OrganizationUnit.objects.get(name="Supply Chain and Distribution Division")
+        facility = Facility.objects.get(name="Chakan Components Plant")
 
-        additive_user = UserAccount.objects.get(email="alpha.additive@module1-demo.invalid")
-        combined_user = UserAccount.objects.get(email="alpha.combined@module1-demo.invalid")
+        additive_user = UserAccount.objects.get(email="kavya.iyer@aurelia-demo.invalid")
+        combined_user = UserAccount.objects.get(email="arjun.rao@aurelia-demo.invalid")
 
         self.assertCountEqual(
-            additive_user.user_roles.get(role__name="Module 1 Additive Manufacturing")
+            additive_user.user_roles.get(role__name="Manufacturing Division Viewer")
             .scopes.values_list("scope_type", "scope_id"),
             [(SCOPE_TYPE_ORG_UNIT, manufacturing_unit.id)],
         )
         self.assertCountEqual(
-            additive_user.user_roles.get(role__name="Module 1 Additive Logistics")
+            additive_user.user_roles.get(role__name="Distribution Division Viewer")
             .scopes.values_list("scope_type", "scope_id"),
             [(SCOPE_TYPE_ORG_UNIT, logistics_unit.id)],
         )
         self.assertCountEqual(
-            combined_user.user_roles.get(role__name="Module 1 Combined Scoped")
+            combined_user.user_roles.get(role__name="Plant Compliance Coordinator")
             .scopes.values_list("scope_type", "scope_id"),
             [
                 (SCOPE_TYPE_ORG_UNIT, manufacturing_unit.id),
-                (SCOPE_TYPE_FACILITY, alpha_plant_1.id),
+                (SCOPE_TYPE_FACILITY, facility.id),
             ],
         )
 
     def test_seeded_data_remains_separated_by_company(self):
         self.run_seed()
-        alpha_company = Company.objects.get(tenant_code="module1-alpha")
-        beta_company = Company.objects.get(tenant_code="module1-beta")
+        alpha_company = Company.objects.get(tenant_code="aurelia-precision")
+        beta_company = Company.objects.get(tenant_code="nexora-logistics")
 
         self.assertTrue(
-            OrganizationUnit.objects.filter(company=alpha_company, name="Alpha Manufacturing").exists()
+            OrganizationUnit.objects.filter(company=alpha_company, name="Western Manufacturing Division").exists()
         )
         self.assertFalse(
-            OrganizationUnit.objects.filter(company=beta_company, name="Alpha Manufacturing").exists()
+            OrganizationUnit.objects.filter(company=beta_company, name="Western Manufacturing Division").exists()
         )
         self.assertTrue(
-            Facility.objects.filter(company=beta_company, name="Beta Terminal 1").exists()
+            Facility.objects.filter(company=beta_company, name="Chennai Freight Terminal").exists()
         )
         self.assertFalse(
-            Facility.objects.filter(company=alpha_company, name="Beta Terminal 1").exists()
+            Facility.objects.filter(company=alpha_company, name="Chennai Freight Terminal").exists()
         )
 
     def test_seeded_users_can_share_email_across_different_companies_if_needed(self):
         self.run_seed()
         shared_email = "shared@module1-demo.invalid"
-        alpha = Company.objects.get(tenant_code="module1-alpha")
-        beta = Company.objects.get(tenant_code="module1-beta")
+        alpha = Company.objects.get(tenant_code="aurelia-precision")
+        beta = Company.objects.get(tenant_code="nexora-logistics")
 
         UserAccount.objects.create(
             company=alpha,
