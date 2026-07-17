@@ -105,3 +105,8 @@ Desktop.ini
 *.swo
 *.bak
 *.tmp
+
+
+#environment variable 
+.env
+
