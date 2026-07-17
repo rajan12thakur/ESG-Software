@@ -1,5 +1,6 @@
 import uuid
 
+from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.db import IntegrityError, connection, transaction
@@ -9,6 +10,7 @@ from django.urls import include, path
 from django.views import View
 
 from accounts import models as account_models
+from accounts.forms import CompanyRoleForm, UserAccountCreateForm, UserAccountUpdateForm
 from accounts.mixins import RolePermissionMixin
 from accounts.models import Permission, Role, RolePermission, UserAccount, UserRole, UserRoleScope
 from accounts.permission_catalog import (
@@ -130,6 +132,41 @@ class SchemaStateTests(TestCase):
         self.assertFalse(hasattr(account_models, "RolePermissionScope"))
         self.assertNotIn("accounts_userpermission", connection.introspection.table_names())
         self.assertNotIn("accounts_rolepermissionscope", connection.introspection.table_names())
+
+
+class AccountFormWidgetTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.company = Company.objects.create(
+            legal_name="Form Tenant",
+            display_name="Form Tenant",
+            tenant_code="form-tenant",
+        )
+        cls.department = Department.objects.create(company=cls.company, name="Operations")
+
+    def test_user_account_create_form_uses_expected_widgets_and_placeholders(self):
+        form = UserAccountCreateForm(company=self.company)
+
+        self.assertIsInstance(form.fields["email"].widget, forms.EmailInput)
+        self.assertIsInstance(form.fields["phone"].widget, forms.TelInput)
+        self.assertIsInstance(form.fields["password"].widget, forms.PasswordInput)
+        self.assertFalse(form.fields["password"].widget.render_value)
+        self.assertEqual(form.fields["first_name"].widget.attrs["placeholder"], "Enter first name")
+        self.assertEqual(form.fields["email"].widget.attrs["placeholder"], "Enter email address")
+        self.assertEqual(form.fields["password"].widget.attrs["placeholder"], "Enter password")
+
+    def test_user_account_update_form_keeps_expected_placeholders(self):
+        form = UserAccountUpdateForm(company=self.company)
+
+        self.assertEqual(form.fields["employee_code"].widget.attrs["placeholder"], "Enter employee code")
+        self.assertEqual(form.fields["phone"].widget.attrs["placeholder"], "Enter phone number")
+
+    def test_company_role_form_uses_textarea_and_placeholder(self):
+        form = CompanyRoleForm(company=self.company)
+
+        self.assertIsInstance(form.fields["description"].widget, forms.Textarea)
+        self.assertEqual(form.fields["name"].widget.attrs["placeholder"], "Enter role name")
+        self.assertEqual(form.fields["description"].widget.attrs["placeholder"], "Describe this role")
 
 
 class PermissionCatalogSeedTests(TestCase):

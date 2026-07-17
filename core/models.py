@@ -17,7 +17,7 @@ class Company(models.Model):
     industry = models.CharField(max_length=150, blank=True)
     country = models.CharField(max_length=100, blank=True)
     currency = models.CharField(max_length=10, blank=True)
-    timezone = models.CharField(max_length=100, blank=True)
+    timezone = models.CharField(max_length=100, blank=True, default="Asia/Kolkata")
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="active")
     is_demo_tenant = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

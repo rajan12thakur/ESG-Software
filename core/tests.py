@@ -1,14 +1,59 @@
 from io import StringIO
 
+from django import forms
 from django.contrib.auth.hashers import make_password
 from django.core.management import call_command
 from django.test import TestCase
 
+from core.forms import CompanyProfileForm, DepartmentForm, FacilityForm, OrganizationUnitForm
 from accounts.models import Permission, Role, RolePermission, UserAccount, UserDepartment, UserRole, UserRoleScope
 from accounts.permission_catalog import CANONICAL_PERMISSION_CODES, get_permission_map
 from accounts.rbac import SCOPE_TYPE_FACILITY, SCOPE_TYPE_ORG_UNIT
 from authentication.tokens import create_access_token
 from core.models import Company, CompanyProfile, Department, Facility, OrganizationUnit
+
+
+class CoreFormWidgetTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.company = Company.objects.create(
+            legal_name="Core Form Tenant",
+            display_name="Core Form Tenant",
+            tenant_code="core-form-tenant",
+        )
+        cls.parent_unit = OrganizationUnit.objects.create(company=cls.company, name="Parent Unit")
+
+    def test_company_profile_form_uses_number_and_textarea_widgets(self):
+        form = CompanyProfileForm()
+
+        self.assertIsInstance(form.fields["employee_count"].widget, forms.NumberInput)
+        self.assertIsInstance(form.fields["annual_revenue"].widget, forms.NumberInput)
+        self.assertIsInstance(form.fields["description"].widget, forms.Textarea)
+        self.assertEqual(form.fields["annual_revenue"].widget.attrs["placeholder"], "Enter annual revenue")
+
+    def test_department_form_uses_expected_placeholders(self):
+        form = DepartmentForm()
+
+        self.assertEqual(form.fields["name"].widget.attrs["placeholder"], "Enter department name")
+        self.assertEqual(form.fields["description"].widget.attrs["placeholder"], "Enter department description")
+
+    def test_organization_unit_form_uses_expected_widgets(self):
+        form = OrganizationUnitForm(company=self.company)
+
+        self.assertIsInstance(form.fields["ownership_percentage"].widget, forms.NumberInput)
+        self.assertEqual(
+            form.fields["ownership_percentage"].widget.attrs["placeholder"],
+            "Enter ownership percentage",
+        )
+        self.assertEqual(form.fields["name"].widget.attrs["placeholder"], "Enter organization unit name")
+
+    def test_facility_form_uses_expected_widgets(self):
+        form = FacilityForm(company=self.company)
+
+        self.assertIsInstance(form.fields["latitude"].widget, forms.NumberInput)
+        self.assertIsInstance(form.fields["longitude"].widget, forms.NumberInput)
+        self.assertIsInstance(form.fields["address"].widget, forms.Textarea)
+        self.assertEqual(form.fields["name"].widget.attrs["placeholder"], "Enter facility name")
 
 
 class OrganizationAreaScopeIntegrationTests(TestCase):

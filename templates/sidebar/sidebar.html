@@ -1,0 +1,45 @@
+<aside class="sidebar">
+    {% with current_url=request.resolver_match.url_name %}
+    <div class="sidebar__brand">
+        <strong class="sidebar__title">
+            {% if sidebar_variant == "platform" %}
+                ESG Platform Admin
+            {% else %}
+                {{ request.company.display_name|default:request.company.legal_name|default:"ESG Platform" }}
+            {% endif %}
+        </strong>
+    </div>
+
+    <nav class="sidebar__nav" aria-label="Primary">
+        {% if sidebar_variant == "platform" %}
+            <a class="sidebar__link{% if current_url == 'platform-dashboard' %} is-active{% endif %}" href="{% url 'platform-dashboard' %}">Dashboard</a>
+            <a class="sidebar__link{% if current_url == 'platform-company-list' or current_url == 'platform-company-create' or current_url == 'platform-company-detail' or current_url == 'platform-company-activate' or current_url == 'platform-company-deactivate' or current_url == 'platform-company-admin-create' %} is-active{% endif %}" href="{% url 'platform-company-list' %}">Companies</a>
+        {% else %}
+            <a class="sidebar__link{% if current_url == 'company-dashboard' %} is-active{% endif %}" href="{% url 'company-dashboard' %}">Dashboard</a>
+            <a class="sidebar__link{% if current_url == 'account-user-list' or current_url == 'account-user-create' or current_url == 'account-user-detail' or current_url == 'account-user-update' or current_url == 'account-user-activate' or current_url == 'account-user-deactivate' %} is-active{% endif %}" href="{% url 'account-user-list' %}">Users</a>
+            <a class="sidebar__link{% if current_url == 'account-role-list' or current_url == 'account-role-create' or current_url == 'account-role-update' or current_url == 'account-role-permissions' %} is-active{% endif %}" href="{% url 'account-role-list' %}">Roles</a>
+            <a class="sidebar__link{% if current_url == 'company-department-list' or current_url == 'company-department-create' or current_url == 'company-department-update' %} is-active{% endif %}" href="{% url 'company-department-list' %}">Departments</a>
+            <a class="sidebar__link{% if current_url == 'company-unit-list' or current_url == 'company-unit-create' or current_url == 'company-unit-update' or current_url == 'company-unit-facility-list' or current_url == 'company-unit-facility-create' or current_url == 'company-unit-facility-update' %} is-active{% endif %}" href="{% url 'company-unit-list' %}">Organization Units</a>
+            <a class="sidebar__link{% if current_url == 'company-profile' %} is-active{% endif %}" href="{% url 'company-profile' %}">Company Profile</a>
+        {% endif %}
+    </nav>
+
+    <div class="sidebar__footer">
+        {% if sidebar_variant == "platform" %}
+            {% if request.user.is_authenticated %}
+                <form method="post" action="{% url 'platform-logout' %}">
+                    {% csrf_token %}
+                    <button class="sidebar__logout" type="submit">Logout</button>
+                </form>
+            {% endif %}
+        {% else %}
+            {% if request.user_account %}
+                <form method="post" action="{% url 'company-logout' %}">
+                    {% csrf_token %}
+                    <button class="sidebar__logout" type="submit">Logout</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+    {% endwith %}
+</aside>
