@@ -13,6 +13,10 @@
             --line: #d9e1d4;
             --accent: #2f6f4e;
             --danger: #9d2d1c;
+            --sidebar: #1d2a21;
+            --sidebar-soft: #243329;
+            --sidebar-text: #edf2ee;
+            --sidebar-muted: #b4c0b6;
         }
 
         * { box-sizing: border-box; }
@@ -25,31 +29,98 @@
             background: var(--bg);
         }
 
-        header {
-            background: var(--panel);
-            border-bottom: 1px solid var(--line);
-        }
-
-        .bar,
-        main {
-            width: min(1120px, calc(100% - 32px));
+        .layout {
+            width: min(1400px, calc(100% - 32px));
             margin: 0 auto;
+            padding: 16px 0 28px;
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
         }
 
-        .bar {
-            min-height: 68px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
+        .sidebar {
+            position: sticky;
+            top: 16px;
+            min-height: calc(100vh - 32px);
+            border-radius: 18px;
+            padding: 20px;
+            background: linear-gradient(180deg, var(--sidebar), #152018);
+            color: var(--sidebar-text);
+            box-shadow: 0 20px 45px rgba(13, 20, 15, .14);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
         }
 
-        nav,
-        .actions {
+        .sidebar__brand {
+            display: grid;
+            gap: 4px;
+        }
+
+        .sidebar__eyebrow {
+            color: var(--sidebar-muted);
+            font-size: 12px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .sidebar__title {
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
+        .sidebar__nav {
+            display: grid;
+            gap: 8px;
+            align-content: start;
+        }
+
+        .sidebar__link,
+        .sidebar__footer button {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            justify-content: flex-start;
+            min-height: 42px;
+            padding: 0 14px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--sidebar-text);
+            font: inherit;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar__link:hover,
+        .sidebar__footer button:hover {
+            background: var(--sidebar-soft);
+        }
+
+        .sidebar__link.is-active {
+            background: rgba(237, 242, 238, .12);
+            border-color: rgba(237, 242, 238, .12);
+        }
+
+        .sidebar__logout {
+            width: 100%;
+            border-color: rgba(237, 242, 238, .18);
+            box-shadow: inset 0 0 0 1px rgba(237, 242, 238, .08);
+        }
+
+        .sidebar__footer {
+            display: grid;
+            gap: 12px;
+            align-content: end;
+        }
+
+        main {
+            width: auto;
+            margin: 0;
+            padding: 0;
         }
 
         main {
@@ -174,39 +245,35 @@
             color: var(--danger);
         }
 
+        @media (max-width: 960px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+                min-height: auto;
+            }
+        }
+
         @media (max-width: 760px) {
-            .bar {
-                align-items: flex-start;
-                flex-direction: column;
-                padding: 14px 0;
+            .layout {
+                width: calc(100% - 20px);
+                padding-top: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="bar">
-            <strong>{{ request.company }}</strong>
-            <nav>
-                <a href="{% url 'company-dashboard' %}">Dashboard</a>
-                <a href="{% url 'account-user-list' %}">Users</a>
-                <a href="{% url 'account-role-list' %}">Roles</a>
-                <a href="{% url 'company-department-list' %}">Departments</a>
-                <a href="{% url 'company-unit-list' %}">Organization Units</a>
-                <a href="{% url 'company-profile' %}">Company Profile</a>
-                <form method="post" action="{% url 'company-logout' %}">
-                    {% csrf_token %}
-                    <button class="secondary" type="submit">Logout</button>
-                </form>
-            </nav>
-        </div>
-    </header>
+    <div class="layout">
+        {% include "sidebar/sidebar.html" %}
 
-    <main>
-        {% for message in messages %}
-            <div class="message">{{ message }}</div>
-        {% endfor %}
-        {% block content %}{% endblock %}
-    </main>
+        <main>
+            {% for message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 </body>
 </html>

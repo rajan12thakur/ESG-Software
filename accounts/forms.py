@@ -35,6 +35,10 @@ class CompanyRoleForm(forms.ModelForm):
     class Meta:
         model = Role
         fields = ["name", "description", "is_active"]
+        widgets = {
+            "name": forms.TextInput(attrs={"placeholder": "Enter role name"}),
+            "description": forms.Textarea(attrs={"rows": 4, "placeholder": "Describe this role"}),
+        }
 
     def __init__(self, *args, company, **kwargs):
         super().__init__(*args, **kwargs)
@@ -76,6 +80,13 @@ class BaseUserAccountForm(forms.ModelForm):
             "phone",
             "is_active",
         ]
+        widgets = {
+            "employee_code": forms.TextInput(attrs={"placeholder": "Enter employee code"}),
+            "first_name": forms.TextInput(attrs={"placeholder": "Enter first name"}),
+            "last_name": forms.TextInput(attrs={"placeholder": "Enter last name"}),
+            "email": forms.EmailInput(attrs={"placeholder": "Enter email address"}),
+            "phone": forms.TelInput(attrs={"placeholder": "Enter phone number"}),
+        }
 
     def __init__(self, *args, company, **kwargs):
         self.company = company
@@ -393,7 +404,12 @@ class BaseUserAccountForm(forms.ModelForm):
 
 
 class UserAccountCreateForm(BaseUserAccountForm):
-    password = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            render_value=False,
+            attrs={"placeholder": "Enter password"},
+        )
+    )
 
     def clean_password(self):
         password = self.cleaned_data["password"]
